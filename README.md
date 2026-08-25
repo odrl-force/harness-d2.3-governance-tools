@@ -1,4 +1,4 @@
-# D2.3 - Solid Pod <-> Data Space Bridge
+# D2.3 - Solid Pod <-> Data Space
 
 **HARNESS: Deliverable D2.3 - Tools for Governance of Data and AI Services**  
 
@@ -64,7 +64,7 @@ cd d2.3-solid-dataspace-bridge
 ├── requirements/             # Legal and technical requirements
 │   ├── legal-requirements.md # Regulations, obligations, technical needs [DONE - TO BE REVIEWED]
 │   └── technical-specs.md    # Feature list per component- TBD
-├── src/                      # Source code for the bridge - TBD
+├── src/                      # Source code - TBD
 ├── demo/                     # Demo scenario data and scripts - TBD
 └── references/               # Key papers and links - TBD
 ```
