@@ -91,8 +91,6 @@ cd d2.3-solid-dataspace-bridge
 | Marlin | UGent-IDLab-imec | Lead, requirements, implementation |
 | Beatriz Esteves | UGent-IDLab-imec | Supervisor-Reviewer, ODRL/Solid expertise |
 | Meem Arafat Manab | UPM | [TBD]|
-| J. van Herwegen | UGent-IDLab-imec | [TBD] |
-| Wout Slabbinck| UGent-IDLab-imec| [TBD] |
 | Victor Rodríguez-Doncel | UPM | Project coordinator, submission |
 | Harshvardhan Pandit  | ADAPT-TCD | WP2 Coordinator-Reviewer |
 | Celestine Lecat | UNIBO | [TBD] |
