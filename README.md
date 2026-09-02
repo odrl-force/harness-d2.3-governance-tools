@@ -58,7 +58,7 @@ cd d2.3-solid-dataspace-bridge
 .
 ├── README.md                 # This file
 ├── docs/                     # Deliverable documentation
-│   ├── architecture.md       # Architecture description - TBD
+│   ├── architecture.md       # Architecture description - [DONE - TO BE REVIEWED]
 │   ├── demo-scenario.md      # Demo scenario walkthrough - [DONE - TO BE REVIEWED]
 │   └── setup-guide.md        # How to run the prototype - TBD
 ├── requirements/             # Legal and technical requirements
