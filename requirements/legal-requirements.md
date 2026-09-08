@@ -13,7 +13,7 @@ This document maps relevant EU regulations to specific obligations. We then deri
 
 ### In scope
 - **GDPR [(2016/679)](http://data.europa.eu/eli/reg/2016/679/2016-05-04)** - personal data processing principles, consent, purpose limitation, data portability
-- **DGA (Data Governance Act) [(2022/868)](https://eur-lex.europa.eu/eli/reg/2024/1689/oj)** - data altruism, intermediary obligations
+- **DGA (Data Governance Act) [(2022/868)](http://data.europa.eu/eli/reg/2022/868/oj)** - data altruism, intermediary obligations
 - **Data Act [(2023/2854)](https://eur-lex.europa.eu/eli/reg/2023/2854/oj)** - B2C (Business-to-Consumer) and B2B (Business-to-Business) data sharing rights and obligations
 
 ### Out of scope (temporarily awaiting review, collaboration from other DCs and supervisors)
