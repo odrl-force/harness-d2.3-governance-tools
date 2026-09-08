@@ -27,11 +27,10 @@ A person stores their utility/energy consumption data in CSS. When a data space 
 
 | Component | Description | Maintainer | Repo |
 |-----------|-------------|------------|------|
-| CSS | Community Solid Server for data storage | IDLab/SolidLab | [link TBD] |
-| UMA Authorization Server | [TBD] | J. van Herwegen | [link TBD] |
-| ODRL Policy Engine | Evaluates ODRL policies | Wout Slabbinck | [link TBD] |
-| Authorizer | Enforces policy decisions | J. van Herwegen | [link TBD] |
-| Policy Management App | UI for creating/managing ODRL policies | TBD | [link TBD] |
+| CSS | Community Solid Server for data storage | IDLab | [link TBD] |
+| UMA Authorization Server | [TBD] | IDLab | [link TBD] |
+| ODRL Policy Engine | Evaluates ODRL policies | IDLab | [link TBD] |
+| Policy Management App (LOAMA) | UI for creating/managing ODRL policies | IDLab | [link TBD] |
 
 ### New component
 
