@@ -2,6 +2,7 @@
 
 **Status:** DRAFT  
 **Last updated:** 2026-09-02  
+**Last updated:** 2026-09-30   
 **Created:** 2026-08-20  
 **Author:** Marlin  
 **Review:** Beatriz
@@ -32,6 +33,21 @@ between the data space and that stack.
 Under this architecture the pod is a pure resource server. All access control
 moves to the authorization server. This differs from standard Solid, which keeps
 storage and access control together.
+
+## Why the pod holds no policies
+
+Standard Solid keeps storage and access control together. The pod server decides access itself, using WAC or ACP. In D2.3 I separate the two. The pod stores data
+and the authorization server holds the policies.
+
+This matches where Solid is going. The W3C Linked Web Storage Working Group
+(chartered September 2024) is standardising Solid's successor and permits an
+external authorization server. The Community Solid Server paper by Van Herwegen
+and Verborgh [TODO:add citation -- The Community Solid Server:
+Supporting Research & Development in an Evolving Ecosystem] describes authorization as a swappable module of the
+server (WAC, ACP or none).
+
+TODO (@Marlin): confirm with Joachim how the UMA server plugs into CSS before
+claiming more here.
 
 
 ## Existing access flow
@@ -82,18 +98,18 @@ Design questions still open:
 
 Mapped against `requirements/legal-requirements.md`:
 
-| Requirement | Constraint | Supported currently |
-|---|---|---|
-| G2 purpose limitation | `dpv:Purpose` | Yes |
-| G4 storage limitation | `odrl:dateTime` | Yes |
-| G7 deny by default | Decision strategy | Yes |
-| DA2 user-initiated sharing | Policy authorship | Yes |
-| DA3 use restrictions | Prohibition rules | Yes |
-| G1 lawful basis | Legal basis | Unsure |
-| G3 consent status | Consent state | No |
-| D1 altruism organisation | Party or verifiable credential | Unclear/Unsure, needs testing |
-| D2 exact purpose match | Purpose | Partly. Supplying multiple purposes currently passes. |
-| D3 intermediary registration | Registration status | Unsure/No |
+| Requirement | Constraint | Supported per docs | Verified by running? |
+|---|---|---|---|
+| G2 purpose limitation | `dpv:Purpose` | Yes | no |
+| G4 storage limitation | `odrl:dateTime` | Yes | no |
+| G7 deny by default | Decision strategy | Yes | no |
+| DA2 user-initiated sharing | Policy authorship | Yes | no |
+| DA3 use restrictions | Prohibition rules | Yes | no |
+| G1 lawful basis | Legal basis | Unsure | no |
+| G3 consent status | Consent state | No | no |
+| D1 altruism organisation | Party or verifiable credential | Unclear/Unsure, needs testing | no |
+| D2 exact purpose match | Purpose | Partly. Supplying multiple purposes currently passes. | no |
+| D3 intermediary notification | Notification status | Unsure/No | no |
 
 
 
@@ -120,11 +136,11 @@ Out of scope for the proof of concept:
 
 ## Open questions for review
 
-1. Policy combination. The owner's policies plus the recipient's regulatory
+1. ~Policy combination. The owner's policies plus the recipient's regulatory
    obligations are two policies over one request. Is defining this for the
-   legal-obligations case a D2.3 contribution, or too large? (Or am I overcomplicating this?)
-2. The demo scenario's aggregation constraint and duty cannot be enforced.
-   Drop them, or change the scenario?
+   legal-obligations case a D2.3 contribution, or too large? (Or am I overcomplicating this?)~
+2. ~The demo scenario's aggregation constraint and duty cannot be enforced.
+   Drop them, or change the scenario?~
 
 
 ## Next steps for me
