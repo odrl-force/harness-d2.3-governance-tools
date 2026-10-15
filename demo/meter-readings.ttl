@@ -12,6 +12,8 @@
 ex:household-demo-01 a sosa:FeatureOfInterest ;
     dcterms:description "Demo household (invented)" .
 
+# BE: remove '(invented)' as previous comments already establish that this a synthetic dataset
+
 ex:meter-demo-0042 a sosa:Sensor ;
     sosa:observes ex:electricalEnergyConsumption .
 

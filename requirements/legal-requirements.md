@@ -18,12 +18,16 @@ This document maps relevant EU regulations to specific obligations. We then deri
 - **Data Act [(2023/2854)](https://eur-lex.europa.eu/eli/reg/2023/2854/oj)** - B2C (Business-to-Consumer) and B2B (Business-to-Business) data sharing rights and obligations 
 > **Status of law:** reports indicate that Commission proposal COM(2025) 837 final would repeal the DGA and move data altruism into the Data Act. I cite the DGA as currently in force. TODO (@Marlin): confirm the status with Beatriz.
 
+BE: Indeed, the status remains the same, and for the sake of completing the work on time, we can say that that was the status when we started developing and even if the proposal is accepted before the deadline, we consider it out of scope for this deliverable.
+
 ### Out of scope (temporarily awaiting review, collaboration from other DCs and supervisors)
 - AI Act [(2024/1689)](http://data.europa.eu/eli/reg/2024/1689) (currently looking into it, and propose including it as it is relevant in state of the world.)
 - EHDS [(2025/327)](https://eur-lex.europa.eu/eli/reg/2025/327/oj) clinical data standards (domain-specific for proposed use case, EHDS focuses on electronic health data, use case is on utility data in smart city context.)
 - GDPR data breach reporting (not fully informed)
 - Cross-border transfer mechanisms (Chapter V GDPR)
 - EUDI wallet [(2024/1183)](https://eur-lex.europa.eu/eli/reg/2024/1183/oj/eng) (implementing acts not finalised)
+
+BE: GDPR data breach reporting - this should not be out of scope, we might not do anything about it, but it should be in scope anyway
 
 ---
 
@@ -32,7 +36,7 @@ This document maps relevant EU regulations to specific obligations. We then deri
 ### GDPR Requirements
 
 | ID | Regulation | Article(s) | Obligation | When it applies | What must be captured | What must be documented | Technical requirement |
-|----|-----------|------------|------------|-----------------|----------------------|------------------------|----------------------|
+|----|------------|------------|------------|-----------------|-----------------------|-------------------------|-----------------------|
 | G1 | GDPR | Art. 6(1) | Lawful basis must exist before processing | Every time data is accessed from the pod | The legal basis claimed (consent, legitimate interest, contract, etc.) | Record of which legal basis was used | Policy must include `odrl:constraint` for legal basis; engine must verify before granting access. In the D1 scenario the basis is consent, Art. 6(1)(a); see G3 |
 | G2 | GDPR | Art. 5(1)(b) | Purpose limitation: data collected for specified purposes, not processed incompatibly | Every access request | The stated purpose of the data request | Record linking access grant to specific purpose | Policy must include `dpv:Purpose` constraint; engine must match requested purpose to allowed purposes |
 | G3 | GDPR | Art. 7 | Consent must be freely given, specific, informed, unambiguous; withdrawable | When consent is the legal basis | Consent status (given/withdrawn), scope, timestamp | Consent record with date, scope, identity of controller | Policy engine must check consent status; withdrawal must immediately revoke access |
@@ -41,6 +45,8 @@ This document maps relevant EU regulations to specific obligations. We then deri
 | G6 | GDPR | Art. 20 | Data portability: right to receive data in structured, machine-readable format | When data subject requests it or when transferring between controllers | Data format, completeness | Record of portability request and fulfilment | Solid Pod already stores data in RDF (machine-readable); connector must preserve format |
 | G7 | GDPR | Art. 25 | Data protection by design and by default | System design phase | Privacy-preserving defaults | Documentation of design choices | Default policies must be restrictive (deny by default); purpose must always be specified |
 
+BE: G6, would be nice to implement some rights exercising, but don't know if there is time for this. I would remove it for now.
+
 ### DGA (Data Governance Act) Requirements
 
 | ID | Regulation | Article(s) | Obligation | When it applies | What must be captured | What must be documented | Technical requirement |
@@ -48,6 +54,13 @@ This document maps relevant EU regulations to specific obligations. We then deri
 | D1 | DGA | Art. 2(16), Ch. IV | Data altruism: voluntary sharing on the basis of the data subject's consent, for objectives of general interest (Art. 2(16)). In this scenario the GDPR legal basis is therefore consent, Art. 6(1)(a), which ties G1 to G3 | When a citizen chooses to share data for public benefit (e.g., urban planning) | Purpose (must be "general interest"), consent form used, identity of data altruism org | European data altruism consent form record (Art. 25) | Policy must distinguish altruistic vs. commercial purposes; specific consent form metadata must be captured; consent is represented by the owner's policy (see G1, G3) |
 | D2 | DGA | Art. 21(2) | A recognised data altruism organisation must not use the data for objectives other than the general-interest ones the data subject or data holder allowed | Every use of altruistically shared data | Purpose of each use | Log of purpose per access | Purpose enforcement in policy engine, same as G2. Exact match only is a design choice of D2.3, stricter than Art. 21(2), which does not prescribe exact matching |
 | D3 | DGA | Art. 11-12 | Data intermediation services providers must notify the competent authority (Art. 11) and stay neutral, not using the data for their own purposes (Art. 12(a)) | When a data intermediary facilitates the exchange | Intermediary identity, notification status, neutrality status | Notification and compliance record | Bridge must verify intermediary notification status (public register, Art. 11(10)) before enabling access |
+
+BE: on D2, under 'What must be documented', should be:
+- Article 20 - Transparency requirements
+- notice in 21.1 should be added - but maybe this one should not be under D2, should be D3 and the current D3 will be D4
+
+BE: currently I don't see the need for D3 (data intermediation) unless you add the sharing with commercial parties to the scenario
+
 
 ### Data Act Requirements
 
@@ -64,35 +77,36 @@ This document maps relevant EU regulations to specific obligations. We then deri
 
 *Per architecture.md, unverified until the evaluator runs.*
 
-| Requirement | Already implemented? | Where? | Gap? |
-|-------------|---------------------|--------|------|
-| G1 (Lawful basis) | Unsure | Legal basis constraint | To test |
-| G2 (Purpose) | Yes | `dpv:Purpose` constraint | Multiple purposes currently pass (see D2) |
-| G3 (Consent) | No | None. Consent is represented by the owner's policy | Consent state and withdrawal not supported |
-| G4 (Time limits) | Yes | `odrl:dateTime` constraint | None known |
-| G5 (Information provision) | TBD | TBD | TBD |
-| G6 (Portability) | TBD | TBD | TBD |
-| G7 (By design) | Yes | Default-deny decision strategy | None known |
-| D1 (Data altruism) | Unclear | Party or verifiable credential | Mechanism to be tested |
-| D2 (Altruism purpose lock) | Partly | `dpv:Purpose` constraint | Multiple purposes pass; exact match is a design choice |
-| D3 (Intermediary check) | Unsure/No | Notification status | No mechanism established |
-| DA1 (IoT access) | TBD | TBD | TBD |
-| DA2 (User-initiated sharing) | Yes | Policy authorship (LOAMA) | None known |
-| DA3 (Use restrictions) | Yes | Prohibition rules; prohibition-overrides-permission strategy | None known |
+| Requirement                  | Already implemented? | Where?                                                       | Gap?                                                   |
+|------------------------------|----------------------|--------------------------------------------------------------|--------------------------------------------------------|
+| G1 (Lawful basis)            | Unsure               | Legal basis constraint                                       | To test                                                |
+| G2 (Purpose)                 | Yes                  | `dpv:Purpose` constraint                                     | Multiple purposes currently pass (see D2)              |
+| G3 (Consent)                 | No                   | None. Consent is represented by the owner's policy           | Consent state and withdrawal not supported             |
+| G4 (Time limits)             | Yes                  | `odrl:dateTime` constraint                                   | None known                                             |
+| G5 (Information provision)   | TBD                  | TBD                                                          | TBD                                                    |
+| G6 (Portability)             | TBD                  | TBD                                                          | TBD                                                    |
+| G7 (By design)               | Yes                  | Default-deny decision strategy                               | None known                                             |
+| D1 (Data altruism)           | Unclear              | Party or verifiable credential                               | Mechanism to be tested                                 |
+| D2 (Altruism purpose lock)   | Partly               | `dpv:Purpose` constraint                                     | Multiple purposes pass; exact match is a design choice |
+| D3 (Intermediary check)      | Unsure/No            | Notification status                                          | No mechanism established                               |
+| DA1 (IoT access)             | TBD                  | TBD                                                          | TBD                                                    |
+| DA2 (User-initiated sharing) | Yes                  | Policy authorship (LOAMA)                                    | None known                                             |
+| DA3 (Use restrictions)       | Yes                  | Prohibition rules; prohibition-overrides-permission strategy | None known                                             |
 
 ---
 
 ## Priority for PoC implementation
 
 ### Must-have (minimum viable prototype)
+- G1: Explicit legal basis in policies
 - G2: Purpose-based access control 
 - G4: Time-limited access
 - G7: Deny-by-default
 - DA2: User-initiated sharing via bridge
+- DA3: Prohibition enforcement in demo (already implemented in the evaluator)
 - Bridge: Connector <-> server UMA communication 
 
 ### Should-have (makes it a stronger demo)
-- G1: Explicit legal basis in policies
 - G3: Consent with withdrawal
 - D1: Data altruism purpose categories
 - DA1: IoT data ingestion (can use synthetic data)
@@ -100,7 +114,6 @@ This document maps relevant EU regulations to specific obligations. We then deri
 ### Maybe-have (if time permits)
 - G5: Information provision logging
 - D3: Intermediary registry check
-- DA3: Prohibition enforcement in demo
 
 ---
 

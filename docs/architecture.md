@@ -21,14 +21,14 @@ between the data space and that stack.
 
 ## Components
 
-| Component | Job | New or existing |
-|-----------|-----|-----------------|
-| Solid pod (CSS) | Stores the data. Holds no policies. | Existing |
-| Authorization server (UMA) | Holds policies, issues tickets and tokens, orchestrates evaluation | Existing |
-| ODRL evaluator | Decides whether a request satisfies a policy. Returns a compliance report. | Existing |
-| Policy management interface (LOAMA)| Where the owner writes and manages policies | Existing |
-| Data space connector (will be informed by Meem) | The participant's gateway into the data space | Existing, not yet selected |
-| Bridge | Translates data space requests into authorization server requests | New. TBD |
+| Component                                       | Job                                                                        | New or existing            |
+|-------------------------------------------------|----------------------------------------------------------------------------|----------------------------|
+| Solid pod (CSS)                                 | Stores the data. Holds no policies.                                        | Existing                   |
+| Authorization server (UMA)                      | Holds policies, issues tickets and tokens, orchestrates evaluation         | Existing                   |
+| ODRL evaluator                                  | Decides whether a request satisfies a policy. Returns a compliance report. | Existing                   |
+| Policy management interface (LOAMA)             | Where the owner writes and manages policies                                | Existing                   |
+| Data space connector (will be informed by Meem) | The participant's gateway into the data space                              | Existing, not yet selected |
+| Bridge                                          | Translates data space requests into authorization server requests          | New. TBD                   |
 
 Under this architecture the pod is a pure resource server. All access control
 moves to the authorization server. This differs from standard Solid, which keeps
@@ -36,8 +36,10 @@ storage and access control together.
 
 ## Why the pod holds no policies
 
-Standard Solid keeps storage and access control together. The pod server decides access itself, using WAC or ACP. In D2.3 I separate the two. The pod stores data
-and the authorization server holds the policies.
+Standard Solid keeps storage and access control together.
+The pod server decides access itself, using WAC or ACP.
+In D2.3, storage and access control are separated.
+The pod stores data and the authorization server holds the policies and enforces them.
 
 This matches where Solid is going. The W3C Linked Web Storage Working Group
 (chartered September 2024) is standardising Solid's successor and permits an
@@ -46,29 +48,29 @@ and Verborgh [TODO:add citation -- The Community Solid Server:
 Supporting Research & Development in an Evolving Ecosystem] describes authorization as a swappable module of the
 server (WAC, ACP or none).
 
-TODO (@Marlin): confirm with Joachim how the UMA server plugs into CSS before
-claiming more here.
+TODO (@Marlin): confirm with Joanna how the UMA server plugs into CSS before
+claiming more here. BE: indeed, policies can be stored anywhere, so you can clarify this here
 
 
 ## Existing access flow
 
 
 ```
-CLIENT                    POD                    AUTHORIZATION SERVER
-  |                        |                          |
-  |--- GET /resource ----->|                          |
-  |                        |--- is this public? ----->|
-  |                        |<-- no -------------------|
-  |                        |--- client wants access ->|
-  |                        |<-- ticket ---------------|
-  |<-- go there + ticket --|                          |
-  |                        |                          |
-  |--- ticket + identity + purpose ----------------->|
-  |                        |            evaluates ODRL policies
-  |<-- access token ---------------------------------|
-  |                        |                          |
-  |--- GET /resource + token -->|                     |
-  |<-- data --------------------|                     |
+CLIENT                         POD                  AUTHORIZATION SERVER
+  |                             |                          |
+  |--- GET /resource ---------->|                          |
+  |                             |--- is this public? ----->|
+  |                             |<-- no -------------------|
+  |                             |--- client wants access ->|
+  |                             |<-- ticket ---------------|
+  |<-- go there + ticket -------|                          |
+  |                             |                          |
+  |--- ticket + identity + purpose ----------------------->|
+  |                             |            evaluates ODRL policies
+  |<-- access token ---------------------------------------|
+  |                             |                          |
+  |--- GET /resource + token -->|                          |
+  |<-- data --------------------|                          |
 ```
 
 Denial returns HTTP 403. The server can also request additional claims before
@@ -80,6 +82,7 @@ run the evaluator once per requested resource, then interpret the compliance
 report into a decision. Two decision strategies are implemented: default-deny,
 and prohibition-overrides-permission.
 
+BE: state of the world should also have the VC for verifying a registered DAO
 
 ## What the bridge does
 TBD
@@ -98,20 +101,24 @@ Design questions still open:
 
 Mapped against `requirements/legal-requirements.md`:
 
-| Requirement | Constraint | Supported per docs | Verified by running? |
-|---|---|---|---|
-| G2 purpose limitation | `dpv:Purpose` | Yes | no |
-| G4 storage limitation | `odrl:dateTime` | Yes | no |
-| G7 deny by default | Decision strategy | Yes | no |
-| DA2 user-initiated sharing | Policy authorship | Yes | no |
-| DA3 use restrictions | Prohibition rules | Yes | no |
-| G1 lawful basis | Legal basis | Unsure | no |
-| G3 consent status | Consent state | No | no |
-| D1 altruism organisation | Party or verifiable credential | Unclear/Unsure, needs testing | no |
-| D2 exact purpose match | Purpose | Partly. Supplying multiple purposes currently passes. | no |
-| D3 intermediary notification | Notification status | Unsure/No | no |
+| Requirement                  | Constraint                     | Supported per docs                                    | Verified by running? |
+|------------------------------|--------------------------------|-------------------------------------------------------|----------------------|
+| G2 purpose limitation        | `dpv:Purpose`                  | Yes                                                   | No                   |
+| G4 storage limitation        | `odrl:dateTime`                | Yes                                                   | No                   |
+| G7 deny by default           | Decision strategy              | Yes                                                   | No                   |
+| DA2 user-initiated sharing   | Policy authorship              | Yes                                                   | No                   |
+| DA3 use restrictions         | Prohibition rules              | Yes                                                   | No                   |
+| G1 lawful basis              | Legal basis                    | Unsure                                                | No                   |
+| G3 consent status            | Consent state                  | No                                                    | No                   |
+| D1 altruism organisation     | Party or verifiable credential | Unclear/Unsure, needs testing                         | No                   |
+| D2 exact purpose match       | Purpose                        | Partly. Supplying multiple purposes currently passes. | No                   |
+| D3 intermediary notification | Notification status            | Unsure/No                                             | No                   |
 
-
+BE: what does 'Verified by running?' mean?
+BE: legal basis is not supported, but we should add it for this
+BE: G3 should be derived from D1 - maybe we should add consent withdrawal as an extra feature that would be nice to have if there is time
+BE: D1 - we already have a VC implementation, let's check if it is enough
+BE: what do you mean by 'Partly. Supplying multiple purposes currently passes.'? 
 
 ## Limits that shape the design
 
