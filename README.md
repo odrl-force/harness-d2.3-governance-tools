@@ -2,16 +2,16 @@
 
 **HARNESS: Deliverable D2.3 - Tools for Governance of Data and AI Services**  
 
-Proof-of-concept: a citizen's data flows from her Solid pod into a data space only as her machin-readble policies allow. Every decision is recorded so she and auditor can check afterwards
+Proof-of-concept: a citizen's data flows from her Solid pod into a data space only as her machine-readable policies allow. Every decision is recorded so she and, e.g.,  an auditor, can check it afterwards
 
 ## What this does
 
-A person (here Anna) keeps here smart-meter readings in her Solid pod abd writes policies on who may read them and why. When a particpant in a data space wants her data:
+A person (here Anna) keeps here smart-meter readings in her Solid pod and writes policies on who may read them and why. When a participant in a data space wants her data:
 
 1. Discovery: The participant finds Anna's dataset in the data space's catalogue which lists the purposes she accepts.
 2. Request: The participant's asks the pod and is sent to Anna's authorisation server where it states who it is and its purpose.
-3. Decision: The auth. server evaluates Anna's policies, the purpose and any existing constraints (e.g temporal). Refusal or token granting occurs here.
-4. Record: Each step is written to a log that Anna can read, with the rule that decided.
+3. Decision: The auth. server evaluates Anna's policies, the purpose and any existing constraints (e.g., temporal). Refusal or token granting occurs here.
+4. Record: Each step is recorded via a logging component which includes an UI where Anna can read the different logged activities.
 
 
 ## Architecture
@@ -45,9 +45,9 @@ flowchart LR
 
 | Part                                    | State                        | Where                            |
 | --------------------------------------- | ---------------------------- | -------------------------------- |
-| Legal requirements                      | draft                        | `requirements/`                  |
-| Scenario and architecture               | draft                        | `docs/`                          |
-| Synthetic meter data                    | done                         | `demo/`                          |
+| Legal requirements                      | draft                        | [requirements](./requirements/)  |
+| Scenario and architecture               | draft                        | [docs](./docs/)                  |
+| Synthetic meter data                    | done                         | [demo](./demo/)                  |
 | Logging component (model, server, page) | draft                        | pull request `logging-component` |
 | Catalogue                               | planned (week of 9 November) |                                  |
 | Client and run script                   | planned                      |                                  |
@@ -89,13 +89,17 @@ Instructions for the other components are added as each one is reviewed and merg
 
 ## Components used
 
-| Component                | Role                                       | Maintainer | Repository                                                                                         |
-| ------------------------ | ------------------------------------------ | ---------- | -------------------------------------------------------------------------------------------------- |
-| Community Solid Server   | the pod                                    | IDLab      | https://github.com/CommunitySolidServer/CommunitySolidServer                                       |
-| UMA authorisation server | holds the policies, decides, issues tokens | IDLab      | https://github.com/SolidLabResearch/user-managed-access/blob/main/documentation/getting-started.md |
-| ODRL evaluator           | evaluates requests against ODRL policies   | IDLab      | https://w3id.org/force/evaluator                                                                   |
-| ODRL validator           | checks that a policy is well-formed        | IDLab      | https://w3id.org/force/validator                                                                   |
-| LOAMA                    | for writing and managing policies          | IDLab      | https://github.com/SolidLabResearch/loama/tree/feat/odrl                                           |
+| Component                | Role                                              | Maintainer | Repository                                                                                         |
+| ------------------------ | ------------------------------------------------- | ---------- | -------------------------------------------------------------------------------------------------- |
+| Community Solid Server   | the pod                                           | IDLab      | https://github.com/CommunitySolidServer/CommunitySolidServer                                       |
+| UMA authorisation server | holds the policies, decides, issues tokens        | IDLab      | https://github.com/SolidLabResearch/user-managed-access/blob/main/documentation/getting-started.md |
+| ODRL evaluator           | evaluates requests against ODRL policies          | IDLab      | https://w3id.org/force/evaluator                                                                   |
+| ODRL validator           | checks that a policy is well-formed               | IDLab      | https://w3id.org/force/validator                                                                   |
+| LOAMA                    | for writing and managing policies with Solid pods | IDLab      | https://github.com/SolidLabResearch/loama/tree/feat/odrl                                           |
+
+## Components created for D2.3
+
+TODO: create table similar to the one above once the new components are created
 
 ## Use case
 
@@ -110,7 +114,7 @@ Utility data in a smart city. Anna's monthly electricity readings sit in her pod
 
 ## Related work
 
-- [ODRL Profile for Access Control (OAC)](https://w3id.org/oac)
+- [DPV-ODRL Profile](https://dev.dpvcg.org/mappings/odrl/)
 - [Data Privacy Vocabulary (DPV)](https://w3id.org/dpv)
 - [TBD]
 
