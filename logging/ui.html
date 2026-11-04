@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Who used my data</title>
+<style>
+  :root { --text: #000; --muted: #444; --line: #ddd; --bg: #fff; --accent: #0072B2; }
+  body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: var(--text); ...
+         max-width: 46rem; margin: 0 auto; padding: 2rem 16px 4rem; line-height: 1.5; font-size: 17px; }
+  h1 { font-size: 1.6rem; margin: 0 0 .25rem; }
+  p.lead { color: var(--muted); margin: 0 0 2rem; }
+  section.attempt { border-top: 1px solid var(--line); padding: 1.25rem 0; }
+  section.attempt h2 { font-size: 1.1rem; margin: 0 0 .5rem; }
+  .outcome-granted { color: var(--accent); font-weight: 700; }
+  ol { margin: .25rem 0 0; padding-left: 1.25rem; }
+  li { margin: .2rem 0; }
+  .small { color: var(--muted); font-size: .9rem; }
+  .chain { margin: 0 0 2rem; }
+  label { font-weight: 700; }
+  select { font: inherit; padding: .2rem; }
+</style>
+</head>
+<body>
+<h1>Who used my data</h1>
+<p class="lead">Every request for Anna's meter readings, what was asked, what was decided and why. Newest first.</p>
+<p class="chain" id="chain">Checking the log…</p>
+<p><label for="who">Show</label>
+  <select id="who"><option value="">everyone</option></select></p>
+<div id="list"></div>
+<script>
+const NAMES = {
+  'http://localhost:3000/anna/profile/card#me': 'Anna (you)',
+  'http://localhost:3000/ghent/profile/card#me': 'City of Ghent',
+  'http://localhost:3000/enerco/profile/card#me': 'EnerCo',
+  'http://localhost:3000/other/profile/card#me': 'another party',
+};
+const PURPOSES = {
+  ImprovePublicServices: 'improving public services', OptimisationForConsumer: 'advising you on your energy use',
+  Marketing: 'marketing', Advertising: 'advertising', PersonalisedAdvertising: 'personalised advertising',
+  TargetedAdvertising: 'targeted advertising', DirectMarketing: 'direct marketing', CommercialPurpose: 'commercial purposes',
+  ResearchAndDevelopment: 'research and development', ScientificResearch: 'scientific research',
+};
+const nameOf = (iri) => NAMES[iri] ?? iri;
+const purposeOf = (iri) => PURPOSES[iri.split('#').pop()] ?? iri;
+const ruleOf = (iri) => iri.split('/').pop();
+const time = (t) => new Date(t).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'medium' });
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+function sentence(e) {
+  const who = esc(nameOf(e.requester ?? ''));
+  switch (e.type) {
+    case 'PolicyCreated': return `You added the rule ${esc(ruleOf(e.policy?.id ?? ''))}.`;
+    case 'PolicyRemoved': return `You removed the rule ${esc(ruleOf(e.policy?.id ?? ''))}.`;
+    case 'AccessRequested': return `${who} asked to ${e.action?.endsWith('write') ? 'change' : 'read'} the data`
+      + (e.purposes?.length ? ` for ${e.purposes.map(purposeOf).map(esc).join(' and ')}.` : ', without saying why.');
+    case 'DecisionMade': {
+      const d = e.decision === 'granted' ? '<span class="outcome-granted">Allowed</span>' : e.decision === 'need_info' ? 'More information asked' : 'Refused';
+      let rules = '';
+      if (e.rules?.length) rules = ` Rules that applied: ${e.rules.map(ruleOf).map(esc).join(', ')}.`;
+      else if (e.decision !== 'granted') rules = ' No rule allows this request.';
+      const warn = (e.note ?? '').includes('MISMATCH') ? ' <strong>Warning: this decision does not match your rules.</strong>' : '';
+      return `${d}.${rules}${warn}`;
+    }
+    case 'DataAccessed':
+      if (e.httpStatus >= 300) return `The pod answered ${e.httpStatus}.`;
+      return e.action?.endsWith('write') ? 'The data was stored.' : `${who} received the data.`;
+    default: return esc(e.type);
+  }
+}
+
+async function load() {
+  const [events, chain] = await Promise.all([fetch('/events').then((r) => r.json()), fetch('/verify').then((r) => r.json())]);
+  document.getElementById('chain').textContent = chain.ok
+    ? `${chain.records} entries. None has been changed or removed since it was written.`
+    : `Warning: entry ${chain.brokenAt} has been changed or removed after it was written.`;
+  const sel = document.getElementById('who');
+  for (const r of [...new Set(events.map((e) => e.requester).filter(Boolean))]) {
+    if (![...sel.options].some((o) => o.value === r)) sel.add(new Option(nameOf(r), r));
+  }
+  const groups = new Map();
+  for (const e of events) {
+    if (sel.value && e.requester && e.requester !== sel.value) continue;
+    if (sel.value && !e.requester) continue;
+    if (!groups.has(e.correlation)) groups.set(e.correlation, []);
+    groups.get(e.correlation).push(e);
+  }
+  const html = [...groups.entries()].reverse().map(([id, list]) => {
+    const first = list[0];
+    const title = id === 'setup' ? 'Your rules' : `${esc(nameOf(first.requester ?? ''))}, ${time(first.time)}`;
+    return `<section class="attempt"><h2>${title}</h2><ol>${list.map((e) => `<li>${sentence(e)}</li>`).join('')}</ol>`
+      + `<p class="small">Recorded by ${esc(first.source)}${first.note ? ': ' + esc(first.note) : ''}</p></section>`;
+  }).join('');
+  document.getElementById('list').innerHTML = html || '<p>Nothing yet.</p>';
+}
+document.getElementById('who').addEventListener('change', load);
+load();
+</script>
+</body>
+</html>

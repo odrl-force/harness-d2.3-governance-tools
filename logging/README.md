@@ -1,0 +1,68 @@
+# Logging component
+
+Records what happens to Anna's data: which policies she added or removed, who asked for the
+data and why, what was decided and by which rule and whether the data was read. Anna reads
+the record on a web page. Each entry carries a fingerprint of the one before it so a changed
+or deleted entry shows.
+
+Status: reference version.
+
+
+## Files
+
+| File                | What it is                                                                   |
+| ------------------- | ---------------------------------------------------------------------------- |
+| `log-model.md`      | the design: the five kinds of event, the choices and why, the limits         |
+| `event.schema.json` | the rules every event must follow; the server refuses events that break them |
+| `context.jsonld`    | maps each field to a standard term                                           |
+| `server.mjs`        | the logging server                                                           |
+| `ui.html`           | Anna's log page                                                              |
+| `examples/`         | one example event of each kind and one broken event                          |
+| `data/`             | created when the server runs; holds the log, not committed                   |
+
+## Run it
+
+From the repository root:
+
+```bash
+node logging/server.mjs
+```
+
+Open http://localhost:5100/ for Anna's page. Stop the server with Ctrl+C.
+
+## Try it
+
+In a second terminal, from the repository root, send the five example events in order:
+
+```bash
+for f in logging/examples/[1-5]-*.json; do
+  curl -s -X POST http://localhost:5100/events -H "content-type: application/json" -d @"$f"; echo
+done
+```
+
+Reload the page: Anna adds a rule, the City asks, is allowed, reads and Anna removes the rule.
+
+Send an event that breaks the rules and the server refuses it with a list of what is wrong:
+
+```bash
+curl -s -X POST http://localhost:5100/events -H "content-type: application/json" -d @logging/examples/bad-event.json
+```
+
+## Check that the log has not been changed
+
+1. Open http://localhost:5100/verify. It answers `"ok": true`.
+2. Open `logging/data/events.jsonl`, change any word in line 2, save.
+3. Reload `/verify`. It answers `"ok": false, "brokenAt": 2`.
+
+This shows the log is tamper-evident: an edit to an old entry is detected and located. Whoever
+runs the server could still rewrite the whole file; see `log-model.md`, "Limits".
+
+## Endpoints
+
+| Request              | Does                                                                                          |
+| -------------------- | --------------------------------------------------------------------------------------------- |
+| `POST /events`       | adds one event (JSON); answers 201 with the stored record, or 400 with what is wrong          |
+| `GET /events`        | all events, oldest first; filter with `?requester=`, `?resource=`, `?correlation=`, `?owner=` |
+| `GET /events.jsonld` | the same as linked data                                                                       |
+| `GET /verify`        | checks the chain of fingerprints                                                              |
+| `GET /`              | Anna's page                                                                                   |

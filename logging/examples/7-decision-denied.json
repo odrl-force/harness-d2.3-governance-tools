@@ -1,0 +1,13 @@
+{
+  "type": "DecisionMade",
+  "time": "2026-11-04T10:30:01Z",
+  "correlation": "req-2",
+  "resource": "http://localhost:3000/anna/energy/meter-readings",
+  "owner": "http://localhost:3000/anna/profile/card#me",
+  "source": "run-script",
+  "requester": "http://localhost:3000/enerco/profile/card#me",
+  "decision": "denied",
+  "rules": ["http://example.org/d23/p3-no-targeted-advertising"],
+  "httpStatus": 403,
+  "note": "P3 forbids targeted advertising"
+}
