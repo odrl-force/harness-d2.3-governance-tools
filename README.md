@@ -1,87 +1,112 @@
-# D2.3 - Solid Pod <-> Data Space
+# D2.3 - Solid pods and data spaces
 
 **HARNESS: Deliverable D2.3 - Tools for Governance of Data and AI Services**  
 
-Proof of Concept: Compliance-Based Data Flow from Solid Pods to Data Spaces <!-- wording taken from the proposal -->
+Proof-of-concept: a citizen's data flows from her Solid pod into a data space only as her machin-readble policies allow. Every decision is recorded so she and auditor can check afterwards
 
-## Overview
+## What this does
 
-This repository contains the proof-of-concept implementation for D2.3 of the HARNESS project. The prototype demonstrates how machine-readable policies and compliance technologies can govern the flow of (personal) data from decentralised data vaults into data spaces (e.g CEDS - Common European Data Space), with automated compliance checking.
+A person (here Anna) keeps here smart-meter readings in her Solid pod abd writes policies on who may read them and why. When a particpant in a data space wants her data:
 
-### What this does
+1. Discovery: The participant finds Anna's dataset in the data space's catalogue which lists the purposes she accepts.
+2. Request: The participant's asks the pod and is sent to Anna's authorisation server where it states who it is and its purpose.
+3. Decision: The auth. server evaluates Anna's policies, the purpose and any existing constraints (e.g temporal). Refusal or token granting occurs here.
+4. Record: Each step is written to a log that Anna can read, with the rule that decided.
 
-A person stores their utility/energy consumption data in CSS. When a data space participant (e.g., a city energy authority) wants to access this data, the system:
 
-1. **Receives the request** via a data space connector
-2. **Evaluates ODRL policies** - purpose, time limits and requester status are checked; consent is represented by the owner's policy
-3. **Enforces the decision** - grants or blocks access based on policy evaluation
-4. **Documents compliance** - records what was checked and decided, for audit and accountability
+## Architecture
 
-### Architecture
-
+```mermaid
+flowchart LR
+  subgraph A["Anna's side"]
+    Anna((Anna))
+    Pod[(Pod)]
+    UMA[Authorisation server]
+    Log[Logging server & Anna's log page]
+  end
+  subgraph DS["Data space"]
+    Cat[(Catalogue)]
+    Client[Client]
+  end
+  City((City of Ghent))
+  Anna -- policies --> UMA
+  Anna -- data --> Pod
+  Pod <-- tokens --> UMA
+  City -- acts through --> Client
+  Client -- finds --> Cat
+  Client -- asks --> Pod
+  Client -- claims --> UMA
+  Client -- reads --> Pod
+  UMA -. events .-> Log
+  Anna -- reads --> Log
 ```
-[TBD]
-```
 
-### Components (existing, to be integrated)
+## Status
 
-| Component | Description | Maintainer | Repo |
-|-----------|-------------|------------|------|
-| CSS | Community Solid Server for data storage | IDLab | [link TBD] |
-| UMA Authorization Server | [TBD] | IDLab | [link TBD] |
-| ODRL Policy Engine | Evaluates ODRL policies | IDLab | [link TBD] |
-| Policy Management App (LOAMA) | UI for creating/managing ODRL policies | IDLab | [link TBD] |
-
-### New component
-
-[TBD]
+| Part                                    | State                        | Where                            |
+| --------------------------------------- | ---------------------------- | -------------------------------- |
+| Legal requirements                      | draft                        | `requirements/`                  |
+| Scenario and architecture               | draft                        | `docs/`                          |
+| Synthetic meter data                    | done                         | `demo/`                          |
+| Logging component (model, server, page) | draft                        | pull request `logging-component` |
+| Catalogue                               | planned (week of 9 November) |                                  |
+| Client and run script                   | planned                      |                                  |
+| Policies and test cases                 | planned                      |                                  |
+| Setup guide, screencast, release        | planned (by 27 November)     |                                  |
 
 
 ## Quick start
 
-> ⚠️ Under development - instructions will be added as components become available.
 
-[TODO]
-
+Generate the synthetic meter data (Python 3.8 or later, standard library only):
 ```bash
 # Clone this repo
-git clone https://github.com/odrl-force/harness-d2.3-dataspace-bridge.git
-cd harness-d2.3-dataspace-bridge
-
-# Setup instructions TBD
+git clone https://github.com/odrl-force/harness-d2.3-governance-tools.git
+cd harness-d2.3-governance-tools
+python demo/generate_meter_data.py --synthetic
 ```
+
+[TODO]
+Instructions for the other components are added as each one is reviewed and merged.
 
 ## Project structure
 
 ```
 .
-├── README.md                  # This file
-├── LICENSE                    # MIT licence text (add if not yet in the repo)
-├── docs/                      # Deliverable documentation
-│   ├── architecture.md        # Architecture description - DRAFT, awaiting review
-│   ├── demo-scenario.md       # Demo scenario walkthrough - DRAFT, awaiting review
-│   └── setup-guide.md         # How to run the prototype - TBD
-├── requirements/              # Legal and technical requirements
-│   ├── legal-requirements.md  # Regulations, obligations, technical needs - DRAFT, awaiting review
-│   └── technical-specs.md     # Feature list per component - TBD
-├── src/                       # Source code - TBD
-├── demo/                      # Synthetic meter data - DONE; demo scripts - TBD
-│   ├── README.md              # How the data was made, vocabulary, UCI attribution
-│   ├── generate_meter_data.py # Builds the Turtle file (standard library only)
-│   ├── meter-readings.ttl     # Generated monthly readings, loaded into the pod
-│   └── data/                  # Raw UCI download, not committed (in .gitignore)
-├── policies/                  # Mock ODRL policies (requested by Beatriz) - TBD
-└── references/                # Key papers and links - TBD
+.
+├── README.md
+├── LICENSE                    # MIT
+├── docs/
+│   ├── architecture.md        # draft, being updated
+│   └── demo-scenario.md       # draft, being updated
+├── requirements/
+│   └── legal-requirements.md  # draft, awaiting review
+└── demo/
+    ├── README.md              # data synthesis process, vocabulary, UCI attribution
+    ├── generate_meter_data.py
+    └── meter-readings.ttl
 ```
+
+## Components used
+
+| Component                | Role                                       | Maintainer | Repository                                                                                         |
+| ------------------------ | ------------------------------------------ | ---------- | -------------------------------------------------------------------------------------------------- |
+| Community Solid Server   | the pod                                    | IDLab      | https://github.com/CommunitySolidServer/CommunitySolidServer                                       |
+| UMA authorisation server | holds the policies, decides, issues tokens | IDLab      | https://github.com/SolidLabResearch/user-managed-access/blob/main/documentation/getting-started.md |
+| ODRL evaluator           | evaluates requests against ODRL policies   | IDLab      | https://w3id.org/force/evaluator                                                                   |
+| ODRL validator           | checks that a policy is well-formed        | IDLab      | https://w3id.org/force/validator                                                                   |
+| LOAMA                    | for writing and managing policies          | IDLab      | https://github.com/SolidLabResearch/loama/tree/feat/odrl                                           |
 
 ## Use case
 
-**Utility data in a smart city context.** A citizen's electricity consumption data (collected from IoT smart meters) is stored in their Solid Pod. A city energy authority, participating in a smart cities data space, wants to access consumption data for urban planning. The below must be ensured:
+Utility data in a smart city. Anna's monthly electricity readings sit in her pod.
 
-- The purpose (urban planning) matches an allowed purpose in the citizen's ODRL policies
-- Time constraints are respected
-- The requester's status is checked, and consent is represented by the owner's policy
-- A compliance record is created
+- **Flow 1, data altruism (DGA).** The City of Ghent reads them to improve public services,
+  until a set date. Whether the City should be presented as a recognised data altruism
+  organisation is under discussion.
+- **Flow 2, sharing at the user's request (Data Act Art. 5).** A company Anna chooses reads
+  them to advise her on her energy use. Requester and policy to be defined.
+- **Refusal.** Nobody may read them for marketing or advertising.
 
 ## Related work
 
@@ -91,17 +116,17 @@ cd harness-d2.3-dataspace-bridge
 
 ## Team
 
-| Name | Affiliation | Role |
-|------|------------|------|
-| Marlin | UGent-IDLab-imec | Lead, requirements, implementation |
-| Beatriz Esteves | UGent-IDLab-imec | Supervisor-Reviewer, ODRL/Solid expertise |
-| Meem Arafat Manab | UPM | [TBD]|
-| Victor Rodríguez-Doncel | UPM | Project coordinator, submission |
-| Harshvardhan Pandit  | ADAPT-TCD | WP2 Coordinator-Reviewer |
-| Celestine Lecat | UNIBO | [TBD] |
-| Fabian Linde | UPM | [TBD] |
-| Sheyla Leyva Sanchez | UPM | [TBD] |
-| Victoria Wiegand | ADAPT-TCD | [TBD] |
+| Name                    | Affiliation      | Role                                      |
+| ----------------------- | ---------------- | ----------------------------------------- |
+| Marlin Kisia            | UGent-IDLab-imec | Lead, requirements, implementation        |
+| Beatriz Esteves         | UGent-IDLab-imec | Supervisor-Reviewer, ODRL/Solid expertise |
+| Meem Arafat Manab       | UPM              | [TBD]                                     |
+| Víctor Rodríguez-Doncel | UPM              | Project coordinator, submission           |
+| Harshvardhan Pandit     | ADAPT-TCD        | WP2 Coordinator-Reviewer                  |
+| Célestine Lecat         | UNIBO            | [TBD]                                     |
+| Fabian Linde            | UPM              | [TBD]                                     |
+| Sheyla Leyva-Sánchez    | UPM              | [TBD]                                     |
+| Victoria Wiegand        | ADAPT-TCD        | [TBD]                                     |
 
 
 ## Licence
@@ -110,4 +135,5 @@ MIT License (publicly funded research)
 
 ## Acknowledgements
 
-This work is part of the HARNESS project, funded under the EU Marie Skłodowska-Curie Actions.
+This work is part of the HARNESS project, funded by the European Union under the Marie
+Skłodowska-Curie Actions, grant agreement 101169409.
