@@ -1,0 +1,58 @@
+# D2.3 policy P3: the refusal. Nobody may read Anna's meter readings for marketing
+# or advertising.
+#
+# Requirement: DA3 use restrictions (Data Act Art. 6(2) mapped in legal-requirements.md).
+#
+
+@prefix odrl: <http://www.w3.org/ns/odrl/2/> .
+@prefix dpv:  <https://w3id.org/dpv#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix d23:  <http://example.org/d23/> .
+@prefix req:  <http://example.org/d23/requirement/> .
+
+# Policy: the ban (a Set: it applies to everyone - so no assignee)
+d23:policy-p3-no-marketing
+    a                odrl:Set ;
+    odrl:uid         d23:policy-p3-no-marketing ;
+    dct:title        "Nobody may read Anna's meter readings for marketing or advertising"@en ;
+    dct:references   <http://data.europa.eu/eli/reg/2023/2854/oj> ;  # Data Act
+    dct:requires     req:DA3 ;
+    odrl:permission  d23:p3-anchor ;
+    odrl:prohibition d23:p3-no-marketing , d23:p3-no-advertising , d23:p3-no-personalised-advertising ,
+                     d23:p3-no-targeted-advertising , d23:p3-no-direct-marketing .
+
+# Permission: Anna may read her own data
+d23:p3-anchor a odrl:Permission ;
+    odrl:action odrl:read ; odrl:target <http://localhost:3000/anna/energy/meter-readings> ;
+    odrl:assigner <http://localhost:3000/anna/profile/card#me> ; odrl:assignee <http://localhost:3000/anna/profile/card#me> .
+
+# Prohibition 1: no reading for marketing
+d23:p3-no-marketing a odrl:Prohibition ;
+    odrl:action odrl:read ; odrl:target <http://localhost:3000/anna/energy/meter-readings> ;
+    odrl:assigner <http://localhost:3000/anna/profile/card#me> ; odrl:constraint d23:p3-c-marketing .
+d23:p3-c-marketing a odrl:Constraint ; odrl:leftOperand odrl:purpose ; odrl:operator odrl:eq ; odrl:rightOperand dpv:Marketing .
+
+# Prohibition 2: no reading for advertising
+d23:p3-no-advertising a odrl:Prohibition ;
+    odrl:action odrl:read ; odrl:target <http://localhost:3000/anna/energy/meter-readings> ;
+    odrl:assigner <http://localhost:3000/anna/profile/card#me> ; odrl:constraint d23:p3-c-advertising .
+d23:p3-c-advertising a odrl:Constraint ; odrl:leftOperand odrl:purpose ; odrl:operator odrl:eq ; odrl:rightOperand dpv:Advertising .
+
+# Prohibition 3: no reading for personalised advertising
+d23:p3-no-personalised-advertising a odrl:Prohibition ;
+    odrl:action odrl:read ; odrl:target <http://localhost:3000/anna/energy/meter-readings> ;
+    odrl:assigner <http://localhost:3000/anna/profile/card#me> ; odrl:constraint d23:p3-c-personalised-advertising .
+d23:p3-c-personalised-advertising a odrl:Constraint ; odrl:leftOperand odrl:purpose ; odrl:operator odrl:eq ; odrl:rightOperand dpv:PersonalisedAdvertising .
+
+# Prohibition 4: no reading for targeted advertising
+d23:p3-no-targeted-advertising a odrl:Prohibition ;
+    odrl:action odrl:read ; odrl:target <http://localhost:3000/anna/energy/meter-readings> ;
+    odrl:assigner <http://localhost:3000/anna/profile/card#me> ; odrl:constraint d23:p3-c-targeted-advertising .
+d23:p3-c-targeted-advertising a odrl:Constraint ; odrl:leftOperand odrl:purpose ; odrl:operator odrl:eq ; odrl:rightOperand dpv:TargetedAdvertising .
+
+# Prohibition 5: no reading for direct marketing
+d23:p3-no-direct-marketing a odrl:Prohibition ;
+    odrl:action odrl:read ; odrl:target <http://localhost:3000/anna/energy/meter-readings> ;
+    odrl:assigner <http://localhost:3000/anna/profile/card#me> ; odrl:constraint d23:p3-c-direct-marketing .
+d23:p3-c-direct-marketing a odrl:Constraint ; odrl:leftOperand odrl:purpose ; odrl:operator odrl:eq ; odrl:rightOperand dpv:DirectMarketing .
+

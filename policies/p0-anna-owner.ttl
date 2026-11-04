@@ -1,0 +1,40 @@
+# P0. Anna may write and read her own energy data. 
+# Drafted 29 October 2026.
+#
+
+
+@prefix odrl: <http://www.w3.org/ns/odrl/2/> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix d23:  <http://example.org/d23/> .
+
+
+# Policy: Anna's own access to her energy data
+d23:policy-p0-anna-owner
+    a               odrl:Agreement ;
+    odrl:uid        d23:policy-p0-anna-owner ;
+    odrl:profile    <https://github.com/SolidLabResearch/user-managed-access> ;
+    dct:title       "Anna may store, change and read her own energy data"@en ;
+    odrl:permission d23:p0-create , d23:p0-modify , d23:p0-read .
+
+
+# Permission: Anna may create files in her pod in the energy folder
+d23:p0-create a odrl:Permission ;
+    odrl:action   odrl:create ;
+    odrl:target   <http://localhost:3000/anna/> , <http://localhost:3000/anna/energy/> ,
+                  <http://localhost:3000/anna/energy/meter-readings> ;
+    odrl:assigner <http://localhost:3000/anna/profile/card#me> ;
+    odrl:assignee <http://localhost:3000/anna/profile/card#me> .
+
+# Permission: Anna may change her energy data
+d23:p0-modify a odrl:Permission ;
+    odrl:action   odrl:modify ;
+    odrl:target   <http://localhost:3000/anna/energy/> , <http://localhost:3000/anna/energy/meter-readings> ;
+    odrl:assigner <http://localhost:3000/anna/profile/card#me> ;
+    odrl:assignee <http://localhost:3000/anna/profile/card#me> .
+
+# Permission: Anna may read her energy data
+d23:p0-read a odrl:Permission ;
+    odrl:action   odrl:read ;
+    odrl:target   <http://localhost:3000/anna/energy/> , <http://localhost:3000/anna/energy/meter-readings> ;
+    odrl:assigner <http://localhost:3000/anna/profile/card#me> ;
+    odrl:assignee <http://localhost:3000/anna/profile/card#me> .
