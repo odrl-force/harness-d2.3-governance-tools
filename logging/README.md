@@ -59,7 +59,7 @@ BE: question should we keep a log of events gone wrong?
 This shows the log is tamper-evident: an edit to an old entry is detected and located. Whoever
 runs the server could still rewrite the whole file; see `log-model.md`, "Limits".
 
-BE: we should have policies on who can read and write logs. and they should not be updatable, only create new ones.
+BE: we should have policies on who can read and write logs. logs should not be updatable, it should only be possible to create new ones.
 BE: http://localhost:5100/ now shows "Warning: entry 3 has been changed or removed after it was written."
 
 BE: I would expect every entry to show a timestamp
