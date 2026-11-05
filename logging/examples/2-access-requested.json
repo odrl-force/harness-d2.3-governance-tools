@@ -1,0 +1,12 @@
+{
+  "type": "AccessRequested",
+  "time": "2026-11-04T10:01:00Z",
+  "correlation": "req-1",
+  "resource": "http://localhost:3000/anna/energy/meter-readings",
+  "owner": "http://localhost:3000/anna/profile/card#me",
+  "source": "run-script",
+  "requester": "http://localhost:3000/ghent/profile/card#me",
+  "action": "http://www.w3.org/ns/odrl/2/read",
+  "purposes": ["https://w3id.org/dpv#ImprovePublicServices"],
+  "claimTypes": ["webid", "purpose"]
+}
