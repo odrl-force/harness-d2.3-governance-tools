@@ -14,4 +14,5 @@
 <http://localhost:3000/anna/energy/meter-readings> a odrl:Asset .
 
 # Used by P0.
+# defined in https://w3c.github.io/odrl/community-vocab/
 odrl:create a odrl:Action .
