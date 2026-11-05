@@ -148,9 +148,9 @@ Utility data in a smart city. Anna's monthly electricity readings sit in her pod
 | Victoria Wiegand        | ADAPT-TCD        | [TBD]                                     |
 
 
-## Licence
+## License
 
-MIT License (publicly funded research)
+[MIT License](LICENSE)
 
 ## Acknowledgements
 
