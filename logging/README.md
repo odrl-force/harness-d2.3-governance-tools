@@ -10,15 +10,15 @@ Status: reference version.
 
 ## Files
 
-| File                | What it is                                                                   |
-| ------------------- | ---------------------------------------------------------------------------- |
-| `log-model.md`      | the design: the five kinds of event, the choices and why, the limits         |
-| `event.schema.json` | the rules every event must follow; the server refuses events that break them |
-| `context.jsonld`    | maps each field to a standard term                                           |
-| `server.mjs`        | the logging server                                                           |
-| `ui.html`           | Anna's log page                                                              |
-| `examples/`         | one example event of each kind and one broken event                          |
-| `data/`             | created when the server runs; holds the log, not committed                   |
+| File                                   | What it is                                                                   |
+| -------------------------------------- | ---------------------------------------------------------------------------- |
+| [log-model.md](log-model.md)           | the design: the five kinds of event, the choices and why, the limits         |
+| [event.schema.json](event.schema.json) | the rules every event must follow; the server refuses events that break them |
+| [context.jsonld](context.jsonld)       | maps each field to a standard term                                           |
+| [server.mjs](server.mjs)               | the logging server                                                           |
+| [ui.html](ui.html)                     | Anna's log page                                                              |
+| [examples/](./examples/)               | one example event of each kind and one broken event                          |
+| [data/](./data/)                       | created when the server runs; holds the log, not committed                   |
 
 ## Run it
 
@@ -48,6 +48,8 @@ Send an event that breaks the rules and the server refuses it with a list of wha
 curl -s -X POST http://localhost:5100/events -H "content-type: application/json" -d @logging/examples/bad-event.json
 ```
 
+BE: question should we keep a log of events gone wrong?
+
 ## Check that the log has not been changed
 
 1. Open http://localhost:5100/verify. It answers `"ok": true`.
@@ -56,6 +58,13 @@ curl -s -X POST http://localhost:5100/events -H "content-type: application/json"
 
 This shows the log is tamper-evident: an edit to an old entry is detected and located. Whoever
 runs the server could still rewrite the whole file; see `log-model.md`, "Limits".
+
+BE: we should have policies on who can read and write logs. and they should not be updatable, only create new ones.
+BE: http://localhost:5100/ now shows "Warning: entry 3 has been changed or removed after it was written."
+
+BE: I would expect every entry to show a timestamp
+BE: it's not 'everyone' right? it's Ana because it's her data/policies so she can see everything
+BE: 'Your rules' could be 'Your actions' because Anna should also be able to see when data was added or altered -- not a problem for now, but with some time this might be a very long list so filters will be needed, e.g., to only see policy logs, or data logs, or even data update logs (e.g., to catch unwanted data updates)
 
 ## Endpoints
 
