@@ -1,0 +1,17 @@
+# Types for the parties and data named in the policies. 
+
+@prefix odrl: <http://www.w3.org/ns/odrl/2/> .
+
+# Parties involved
+<http://localhost:3000/anna/profile/card#me>   a odrl:Party .
+<http://localhost:3000/ghent/profile/card#me>  a odrl:Party .
+<http://localhost:3000/enerco/profile/card#me> a odrl:Party .
+<http://localhost:3000/other/profile/card#me>  a odrl:Party .
+
+# Assets: Anna's pod, her energy folder and the meter readings
+<http://localhost:3000/anna/>                  a odrl:Asset .
+<http://localhost:3000/anna/energy/>           a odrl:Asset .
+<http://localhost:3000/anna/energy/meter-readings> a odrl:Asset .
+
+# Used by P0.
+odrl:create a odrl:Action .

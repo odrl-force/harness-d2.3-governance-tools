@@ -1,0 +1,49 @@
+# D2.3 policy P2: flow 2, user-initiated sharing with a company under the Data Act.
+# Anna lets EnerCo, a fictional energy-advice company, read her meter readings to give
+# her advice on her own consumption, until 1 July 2027.
+#
+# Requirements: DA2 user-initiated sharing (Data Act Art. 5), G2 purpose limitation,
+#               G4 storage limitation.
+#
+
+
+@prefix odrl: <http://www.w3.org/ns/odrl/2/> .
+@prefix dpv:  <https://w3id.org/dpv#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix d23:  <http://example.org/d23/> .
+@prefix req:  <http://example.org/d23/requirement/> .
+
+# Policy: Anna and EnerCo (an Agreement with its legal sources and requirements)
+d23:policy-p2-commercial-enerco
+    a              odrl:Agreement ;
+    odrl:uid       d23:policy-p2-commercial-enerco ;
+    dct:title      "Anna lets EnerCo read her meter readings to advise her on her consumption"@en ;
+    dct:references <http://data.europa.eu/eli/reg/2023/2854/oj> ,  # Data Act
+                   <http://data.europa.eu/eli/reg/2016/679/oj> ;   # GDPR
+    dct:requires   req:DA2 , req:G2 , req:G4 ;
+    odrl:permission d23:p2-permission .
+
+# Permission: EnerCo may read the meter readings on the two conditions below
+d23:p2-permission
+    a               odrl:Permission ;
+    odrl:action     odrl:read ;
+    odrl:target     <http://localhost:3000/anna/energy/meter-readings> ;
+    odrl:assigner   <http://localhost:3000/anna/profile/card#me> ;
+    odrl:assignee   <http://localhost:3000/enerco/profile/card#me> ;
+    odrl:constraint d23:p2-purpose , d23:p2-until .
+
+
+# Condition 1: the stated purpose must be "optimisation for the consumer" (advice to Anna)
+d23:p2-purpose
+    a                 odrl:Constraint ;
+    odrl:leftOperand  odrl:purpose ;
+    odrl:operator     odrl:eq ;
+    odrl:rightOperand dpv:OptimisationForConsumer .
+
+# Condition 2: only before 1 July 2027 (UTC)
+d23:p2-until
+    a                 odrl:Constraint ;
+    odrl:leftOperand  odrl:dateTime ;
+    odrl:operator     odrl:lt ;
+    odrl:rightOperand "2027-07-01T00:00:00Z"^^xsd:dateTime .
