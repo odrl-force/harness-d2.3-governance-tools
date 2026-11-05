@@ -73,7 +73,6 @@ Instructions for the other components are added as each one is reviewed and merg
 
 ```
 .
-.
 ├── README.md
 ├── LICENSE                    # MIT
 ├── docs/
@@ -81,10 +80,26 @@ Instructions for the other components are added as each one is reviewed and merg
 │   └── demo-scenario.md       # draft, being updated
 ├── requirements/
 │   └── legal-requirements.md  # draft, awaiting review
-└── demo/
-    ├── README.md              # data synthesis process, vocabulary, UCI attribution
-    ├── generate_meter_data.py
-    └── meter-readings.ttl
+├── demo/
+│   ├── README.md              # data synthesis process
+│   ├── generate_meter_data.py
+│   └── meter-readings.ttl
+├── policies/
+│   ├── README.md              # what each policy does, why
+│   ├── p0-anna-owner.ttl
+│   ├── p1-altruism-city.ttl
+│   ├── p2-commercial-enerco.ttl
+│   ├── p3-no-marketing.ttl
+│   └── shared/
+│       └── parties-and-assets.ttl
+└── logging/
+    ├── README.md              # how to run and try it
+    ├── log-model.md           
+    ├── event.schema.json
+    ├── context.jsonld
+    ├── server.mjs
+    ├── ui.html                # Anna's log page
+    └── examples/              
 ```
 
 ## Components used
