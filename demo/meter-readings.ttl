@@ -1,4 +1,5 @@
-@prefix ex:   <https://pod.example/anna/energy/#> .
+@prefix ex:   <http://localhost:3000/anna/energy/meter-readings#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
 @prefix sosa: <http://www.w3.org/ns/sosa/> .
 @prefix time: <http://www.w3.org/2006/time#> .
 @prefix qudt: <http://qudt.org/schema/qudt/> .
@@ -9,10 +10,12 @@
 # Demo data for HARNESS D2.3. No real person or address.
 # Values invented with a seasonal curve (--synthetic). Not derived from any measurement.
 
+ex:readings a prov:Collection ;
+    dcterms:description "Twelve monthly readings for an invented household. Values come from an invented seasonal curve and are not derived from any measurement."@en ;
+    prov:hadMember ex:obs-2025-01, ex:obs-2025-02, ex:obs-2025-03, ex:obs-2025-04, ex:obs-2025-05, ex:obs-2025-06, ex:obs-2025-07, ex:obs-2025-08, ex:obs-2025-09, ex:obs-2025-10, ex:obs-2025-11, ex:obs-2025-12 .
+
 ex:household-demo-01 a sosa:FeatureOfInterest ;
     dcterms:description "Demo household (invented)" .
-
-# BE: remove '(invented)' as previous comments already establish that this a synthetic dataset
 
 ex:meter-demo-0042 a sosa:Sensor ;
     sosa:observes ex:electricalEnergyConsumption .
@@ -29,7 +32,7 @@ ex:obs-2025-01 a sosa:Observation ;
         time:hasEnd [ a time:Instant ; time:inXSDDateTimeStamp "2025-02-01T00:00:00Z"^^xsd:dateTimeStamp ] ] ;
     sosa:resultTime "2025-02-01T00:00:00Z"^^xsd:dateTimeStamp ;
     sosa:hasResult [ a qudt:QuantityValue ;
-        qudt:numericValue "388.23"^^xsd:decimal ;
+        qudt:numericValue "281.08"^^xsd:decimal ;
         qudt:unit unit:KiloW-HR ] .
 
 ex:obs-2025-02 a sosa:Observation ;
@@ -41,7 +44,7 @@ ex:obs-2025-02 a sosa:Observation ;
         time:hasEnd [ a time:Instant ; time:inXSDDateTimeStamp "2025-03-01T00:00:00Z"^^xsd:dateTimeStamp ] ] ;
     sosa:resultTime "2025-03-01T00:00:00Z"^^xsd:dateTimeStamp ;
     sosa:hasResult [ a qudt:QuantityValue ;
-        qudt:numericValue "327.04"^^xsd:decimal ;
+        qudt:numericValue "236.77"^^xsd:decimal ;
         qudt:unit unit:KiloW-HR ] .
 
 ex:obs-2025-03 a sosa:Observation ;
@@ -53,7 +56,7 @@ ex:obs-2025-03 a sosa:Observation ;
         time:hasEnd [ a time:Instant ; time:inXSDDateTimeStamp "2025-04-01T00:00:00Z"^^xsd:dateTimeStamp ] ] ;
     sosa:resultTime "2025-04-01T00:00:00Z"^^xsd:dateTimeStamp ;
     sosa:hasResult [ a qudt:QuantityValue ;
-        qudt:numericValue "309.79"^^xsd:decimal ;
+        qudt:numericValue "224.29"^^xsd:decimal ;
         qudt:unit unit:KiloW-HR ] .
 
 ex:obs-2025-04 a sosa:Observation ;
@@ -65,7 +68,7 @@ ex:obs-2025-04 a sosa:Observation ;
         time:hasEnd [ a time:Instant ; time:inXSDDateTimeStamp "2025-05-01T00:00:00Z"^^xsd:dateTimeStamp ] ] ;
     sosa:resultTime "2025-05-01T00:00:00Z"^^xsd:dateTimeStamp ;
     sosa:hasResult [ a qudt:QuantityValue ;
-        qudt:numericValue "278.19"^^xsd:decimal ;
+        qudt:numericValue "201.41"^^xsd:decimal ;
         qudt:unit unit:KiloW-HR ] .
 
 ex:obs-2025-05 a sosa:Observation ;
@@ -77,7 +80,7 @@ ex:obs-2025-05 a sosa:Observation ;
         time:hasEnd [ a time:Instant ; time:inXSDDateTimeStamp "2025-06-01T00:00:00Z"^^xsd:dateTimeStamp ] ] ;
     sosa:resultTime "2025-06-01T00:00:00Z"^^xsd:dateTimeStamp ;
     sosa:hasResult [ a qudt:QuantityValue ;
-        qudt:numericValue "267.51"^^xsd:decimal ;
+        qudt:numericValue "193.68"^^xsd:decimal ;
         qudt:unit unit:KiloW-HR ] .
 
 ex:obs-2025-06 a sosa:Observation ;
@@ -89,7 +92,7 @@ ex:obs-2025-06 a sosa:Observation ;
         time:hasEnd [ a time:Instant ; time:inXSDDateTimeStamp "2025-07-01T00:00:00Z"^^xsd:dateTimeStamp ] ] ;
     sosa:resultTime "2025-07-01T00:00:00Z"^^xsd:dateTimeStamp ;
     sosa:hasResult [ a qudt:QuantityValue ;
-        qudt:numericValue "243.50"^^xsd:decimal ;
+        qudt:numericValue "176.29"^^xsd:decimal ;
         qudt:unit unit:KiloW-HR ] .
 
 ex:obs-2025-07 a sosa:Observation ;
@@ -101,7 +104,7 @@ ex:obs-2025-07 a sosa:Observation ;
         time:hasEnd [ a time:Instant ; time:inXSDDateTimeStamp "2025-08-01T00:00:00Z"^^xsd:dateTimeStamp ] ] ;
     sosa:resultTime "2025-08-01T00:00:00Z"^^xsd:dateTimeStamp ;
     sosa:hasResult [ a qudt:QuantityValue ;
-        qudt:numericValue "241.02"^^xsd:decimal ;
+        qudt:numericValue "174.50"^^xsd:decimal ;
         qudt:unit unit:KiloW-HR ] .
 
 ex:obs-2025-08 a sosa:Observation ;
@@ -113,7 +116,7 @@ ex:obs-2025-08 a sosa:Observation ;
         time:hasEnd [ a time:Instant ; time:inXSDDateTimeStamp "2025-09-01T00:00:00Z"^^xsd:dateTimeStamp ] ] ;
     sosa:resultTime "2025-09-01T00:00:00Z"^^xsd:dateTimeStamp ;
     sosa:hasResult [ a qudt:QuantityValue ;
-        qudt:numericValue "215.27"^^xsd:decimal ;
+        qudt:numericValue "155.85"^^xsd:decimal ;
         qudt:unit unit:KiloW-HR ] .
 
 ex:obs-2025-09 a sosa:Observation ;
@@ -125,7 +128,7 @@ ex:obs-2025-09 a sosa:Observation ;
         time:hasEnd [ a time:Instant ; time:inXSDDateTimeStamp "2025-10-01T00:00:00Z"^^xsd:dateTimeStamp ] ] ;
     sosa:resultTime "2025-10-01T00:00:00Z"^^xsd:dateTimeStamp ;
     sosa:hasResult [ a qudt:QuantityValue ;
-        qudt:numericValue "256.11"^^xsd:decimal ;
+        qudt:numericValue "185.42"^^xsd:decimal ;
         qudt:unit unit:KiloW-HR ] .
 
 ex:obs-2025-10 a sosa:Observation ;
@@ -137,7 +140,7 @@ ex:obs-2025-10 a sosa:Observation ;
         time:hasEnd [ a time:Instant ; time:inXSDDateTimeStamp "2025-11-01T00:00:00Z"^^xsd:dateTimeStamp ] ] ;
     sosa:resultTime "2025-11-01T00:00:00Z"^^xsd:dateTimeStamp ;
     sosa:hasResult [ a qudt:QuantityValue ;
-        qudt:numericValue "270.35"^^xsd:decimal ;
+        qudt:numericValue "195.74"^^xsd:decimal ;
         qudt:unit unit:KiloW-HR ] .
 
 ex:obs-2025-11 a sosa:Observation ;
@@ -149,7 +152,7 @@ ex:obs-2025-11 a sosa:Observation ;
         time:hasEnd [ a time:Instant ; time:inXSDDateTimeStamp "2025-12-01T00:00:00Z"^^xsd:dateTimeStamp ] ] ;
     sosa:resultTime "2025-12-01T00:00:00Z"^^xsd:dateTimeStamp ;
     sosa:hasResult [ a qudt:QuantityValue ;
-        qudt:numericValue "321.90"^^xsd:decimal ;
+        qudt:numericValue "233.06"^^xsd:decimal ;
         qudt:unit unit:KiloW-HR ] .
 
 ex:obs-2025-12 a sosa:Observation ;
@@ -161,5 +164,5 @@ ex:obs-2025-12 a sosa:Observation ;
         time:hasEnd [ a time:Instant ; time:inXSDDateTimeStamp "2026-01-01T00:00:00Z"^^xsd:dateTimeStamp ] ] ;
     sosa:resultTime "2026-01-01T00:00:00Z"^^xsd:dateTimeStamp ;
     sosa:hasResult [ a qudt:QuantityValue ;
-        qudt:numericValue "381.08"^^xsd:decimal ;
+        qudt:numericValue "275.90"^^xsd:decimal ;
         qudt:unit unit:KiloW-HR ] .
