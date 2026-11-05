@@ -43,16 +43,16 @@ flowchart LR
 
 ## Status
 
-| Part                                    | State                        | Where                            |
-| --------------------------------------- | ---------------------------- | -------------------------------- |
-| Legal requirements                      | draft                        | [requirements](./requirements/)  |
-| Scenario and architecture               | draft                        | [docs](./docs/)                  |
-| Synthetic meter data                    | done                         | [demo](./demo/)                  |
-| Logging component (model, server, page) | draft                        | pull request `logging-component` |
-| Catalogue                               | planned (week of 9 November) |                                  |
-| Client and run script                   | planned                      |                                  |
-| Policies and test cases                 | planned                      |                                  |
-| Setup guide, screencast, release        | planned (by 27 November)     |                                  |
+| Part                             | State                        | Where                           |
+| -------------------------------- | ---------------------------- | ------------------------------- |
+| Legal requirements               | draft                        | [requirements](./requirements/) |
+| Scenario and architecture        | draft                        | [docs](./docs/)                 |
+| Synthetic meter data             | done                         | [demo](./demo/)                 |
+| Logging component                | draft                        | [logging](./logging/)           |
+| Catalogue                        | planned (week of 9 November) |                                 |
+| Client and run script            | planned                      |                                 |
+| Policies and test cases          | draft                        | [policies](./policies/)         |
+| Setup guide, screencast, release | planned (by 27 November)     |                                 |
 
 
 ## Quick start
