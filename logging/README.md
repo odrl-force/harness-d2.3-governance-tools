@@ -32,7 +32,7 @@ Open http://localhost:5100/ for Anna's page. Stop the server with Ctrl+C.
 
 ## Try it
 
-In a second terminal, from the repository root, send the five example events in order:
+In a second terminal, from the repository root, send the seven example events in order:
 
 ```bash
 for f in logging/examples/[1-7]-*.json; do
@@ -55,7 +55,7 @@ curl -s -X POST http://localhost:5100/events -H "content-type: application/json"
 3. Reload `/verify`. It answers `"ok": false, "brokenAt": 2`.
 
 This shows the log is tamper-evident: an edit to an old entry is detected and located. Whoever
-runs the server could still rewrite the whole file; see `log-model.md`, "Limits".
+runs the server could still rewrite the whole file.
 
 ## Endpoints
 
