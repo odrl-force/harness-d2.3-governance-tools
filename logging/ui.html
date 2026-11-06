@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Who used my data</title>
+<title>Who asked for my meter readings</title>
 <style>
   :root { --text: #000; --muted: #444; --line: #ddd; --bg: #fff; --accent: #0072B2; }
-  body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: var(--text); ...
+  body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: var(--text); background: var(--bg);
          max-width: 46rem; margin: 0 auto; padding: 2rem 16px 4rem; line-height: 1.5; font-size: 17px; }
   h1 { font-size: 1.6rem; margin: 0 0 .25rem; }
   p.lead { color: var(--muted); margin: 0 0 2rem; }
@@ -22,8 +22,8 @@
 </style>
 </head>
 <body>
-<h1>Who used my data</h1>
-<p class="lead">Every request for Anna's meter readings, what was asked, what was decided and why. Newest first.</p>
+<h1>Who asked for my meter readings</h1>
+<p class="lead">Each request, what was decided and why with newest first. Changes to your rules are listed as well.</p>
 <p class="chain" id="chain">Checking the log…</p>
 <p><label for="who">Show</label>
   <select id="who"><option value="">everyone</option></select></p>
@@ -63,8 +63,8 @@ const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&l
 function sentence(e) {
   const who = esc(nameOf(e.requester ?? ''));
   switch (e.type) {
-    case 'PolicyCreated': return `You added the rule ${esc(ruleOf(e.policy?.id ?? ''))}.`;
-    case 'PolicyRemoved': return `You removed the rule ${esc(ruleOf(e.policy?.id ?? ''))}.`;
+    case 'PolicyCreated': return `You added a rule: ${esc(ruleOf(e.policy?.id ?? ''))}.`;
+    case 'PolicyRemoved': return `You removed a rule: ${esc(ruleOf(e.policy?.id ?? ''))}.`;
     case 'AccessRequested': return `${who} asked to ${e.action?.endsWith('write') ? 'change' : 'read'} the data`
       + (e.purposes?.length ? ` for ${e.purposes.map(purposeOf).map(esc).join(' and ')}.` : ', without saying why.');
     case 'DecisionMade': {
@@ -100,7 +100,7 @@ async function load() {
   }
   const html = [...groups.entries()].reverse().map(([id, list]) => {
     const first = list[0];
-    const title = id === 'setup' ? 'Your rules' : `${esc(nameOf(first.requester ?? ''))}, ${day(first.recordedAt ?? first.time)}`;
+    const title = id === 'setup' ? 'Changes to your rules' : `${esc(nameOf(first.requester ?? ''))}, ${day(first.recordedAt ?? first.time)}`;
     return `<section class="attempt"><h2>${title}</h2><ol>${list.map((e) => `<li>${sentence(e)} <span class="small">${clock(e.recordedAt ?? e.time)}</span></li>`).join('')}</ol>`
       + `<p class="small">Recorded by ${esc(first.source)}${first.note ? ': ' + esc(first.note) : ''}</p></section>`;
   }).join('');

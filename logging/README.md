@@ -35,12 +35,12 @@ Open http://localhost:5100/ for Anna's page. Stop the server with Ctrl+C.
 In a second terminal, from the repository root, send the five example events in order:
 
 ```bash
-for f in logging/examples/[1-5]-*.json; do
-  curl -s -X POST http://localhost:5100/events -H "content-type: application/json" -d @"$f"; echo
+for f in logging/examples/[1-7]-*.json; do
+  curl -s -X POST http://localhost:5100/events -H "content-type: application/json" -d @"$f"; echo; sleep 1
 done
 ```
 
-Reload the page: Anna adds a rule, the City asks, is allowed, reads and Anna removes the rule.
+Reload the page: Anna adds a rule, the City asks, is allowed and reads, EnerCo asks for advertising and is refused and Anna removes her rule.
 
 Send an event that breaks the rules and the server refuses it with a list of what is wrong:
 
