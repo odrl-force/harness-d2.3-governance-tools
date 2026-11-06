@@ -1,0 +1,3 @@
+[submodule "external/user-managed-access"]
+	path = external/user-managed-access
+	url = https://github.com/SolidLabResearch/user-managed-access
