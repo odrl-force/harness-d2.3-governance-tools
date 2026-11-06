@@ -49,6 +49,7 @@ flowchart LR
 | Scenario and architecture        | draft                        | [docs](./docs/)                 |
 | Synthetic meter data             | done                         | [demo](./demo/)                 |
 | Logging component                | draft                        | [logging](./logging/)           |
+| Pod and authorisation server     | runs from a pinned submodule | [stack](./stack/)               |
 | Catalogue                        | planned (week of 9 November) |                                 |
 | Client and run script            | planned                      |                                 |
 | Policies and test cases          | draft                        | [policies](./policies/)         |
@@ -110,15 +111,20 @@ Instructions for the other components are added as each one is reviewed and merg
 │   ├── p3-no-marketing.ttl
 │   └── shared/
 │       └── parties-and-assets.ttl
-└── logging/
-    ├── README.md              # how to run and try it
-    ├── log-model.md           
-    ├── event.schema.json
-    ├── context.jsonld
-    ├── server.mjs
-    ├── ui.html                # Anna's log page
-    └── examples/              
-```
+├── logging/
+│   ├── README.md              # how to run and try it
+│   ├── log-model.md
+│   ├── event.schema.json
+│   ├── context.jsonld
+│   ├── server.mjs
+│   ├── ui.html                # Anna's log page
+│   └── examples/
+├── stack/
+│   ├── start.sh               # starts the pod and UMA
+│   └── seed.json              # demo accounts for anna, ghent, enerco, other
+└── external/
+    └── user-managed-access/   # UMA and pod
+````
 
 ## Components used
 
