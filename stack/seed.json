@@ -1,0 +1,6 @@
+[
+  { "email": "anna@example.org",   "password": "d23-demo-only", "pods": [{ "name": "anna" }],   "authz": { "server": "http://localhost:4000/uma" } },
+  { "email": "ghent@example.org",  "password": "d23-demo-only", "pods": [{ "name": "ghent" }],  "authz": { "server": "http://localhost:4000/uma" } },
+  { "email": "enerco@example.org", "password": "d23-demo-only", "pods": [{ "name": "enerco" }], "authz": { "server": "http://localhost:4000/uma" } },
+  { "email": "other@example.org",  "password": "d23-demo-only", "pods": [{ "name": "other" }],  "authz": { "server": "http://localhost:4000/uma" } }
+]

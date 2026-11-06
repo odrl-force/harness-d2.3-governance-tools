@@ -66,6 +66,24 @@ cd harness-d2.3-governance-tools
 python demo/generate_meter_data.py --synthetic
 ```
 
+### Run the pod and the authorisation server
+
+The pod (Community Solid Server - CSS) and the authorisation server (UMA) are sourced from IDLab's
+[user-managed-access](https://github.com/SolidLabResearch/user-managed-access) repository.
+It is included as a git submodule in `external/user-managed-access`, pinned to commit
+4c4134f (14 October 2026).
+
+
+    git clone --recurse-submodules https://github.com/odrl-force/harness-d2.3-governance-tools.git
+    cd harness-d2.3-governance-tools
+    bash stack/start.sh
+
+The first run installs and builds IDLab's code. When it says "Both servers are up", Anna's
+profile is at http://localhost:3000/anna/profile/card. Stop with Ctrl+C. If you cloned
+without `--recurse-submodules`, run `git submodule update --init` once. The accounts in
+`stack/seed.json` and their password are for a local demo only.
+
+
 [TODO]
 Instructions for the other components are added as each one is reviewed and merged.
 
