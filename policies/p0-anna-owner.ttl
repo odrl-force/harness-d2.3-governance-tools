@@ -12,7 +12,6 @@
 d23:policy-p0-anna-owner
     a               odrl:Agreement ;
     odrl:uid        d23:policy-p0-anna-owner ;
-    odrl:profile    <https://github.com/SolidLabResearch/user-managed-access> ;
     dct:title       "Anna may store, change and read her own energy data"@en ;
     odrl:permission d23:p0-create , d23:p0-modify , d23:p0-read .
 
