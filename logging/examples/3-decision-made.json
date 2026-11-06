@@ -1,6 +1,5 @@
 {
   "type": "DecisionMade",
-  "time": "2026-11-04T10:01:02Z",
   "correlation": "req-1",
   "resource": "http://localhost:3000/anna/energy/meter-readings",
   "owner": "http://localhost:3000/anna/profile/card#me",

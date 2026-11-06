@@ -32,15 +32,15 @@ Open http://localhost:5100/ for Anna's page. Stop the server with Ctrl+C.
 
 ## Try it
 
-In a second terminal, from the repository root, send the five example events in order:
+In a second terminal, from the repository root, send the seven example events in order:
 
 ```bash
-for f in logging/examples/[1-5]-*.json; do
-  curl -s -X POST http://localhost:5100/events -H "content-type: application/json" -d @"$f"; echo
+for f in logging/examples/[1-7]-*.json; do
+  curl -s -X POST http://localhost:5100/events -H "content-type: application/json" -d @"$f"; echo; sleep 1
 done
 ```
 
-Reload the page: Anna adds a rule, the City asks, is allowed, reads and Anna removes the rule.
+Reload the page: Anna adds a rule, the City asks, is allowed and reads, EnerCo asks for advertising and is refused and Anna removes her rule.
 
 Send an event that breaks the rules and the server refuses it with a list of what is wrong:
 
@@ -57,7 +57,7 @@ BE: question should we keep a log of events gone wrong?
 3. Reload `/verify`. It answers `"ok": false, "brokenAt": 2`.
 
 This shows the log is tamper-evident: an edit to an old entry is detected and located. Whoever
-runs the server could still rewrite the whole file; see `log-model.md`, "Limits".
+runs the server could still rewrite the whole file.
 
 BE: we should have policies on who can read and write logs. logs should not be updatable, it should only be possible to create new ones.
 BE: http://localhost:5100/ now shows "Warning: entry 3 has been changed or removed after it was written."

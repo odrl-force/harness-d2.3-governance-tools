@@ -31,7 +31,7 @@ function check(ev) {
   for (const k of schema.required) if (ev[k] === undefined) errors.push(`missing '${k}'`);
   for (const k of Object.keys(ev)) {
     if (!schema.properties[k]) errors.push(`unknown field '${k}'`);
-    if (['id', 'seq', 'prevHash', 'hash'].includes(k)) errors.push(`'${k}' is set by the server`);
+    if (['id', 'seq', 'recordedAt', 'prevHash', 'hash'].includes(k)) errors.push(`'${k}' is set by the server`);
   }
   for (const [k, p] of Object.entries(schema.properties)) {
     if (ev[k] !== undefined && p.enum && !p.enum.includes(ev[k])) errors.push(`'${k}' must be one of ${p.enum.join(', ')}`);
@@ -44,7 +44,7 @@ function check(ev) {
 function append(ev) {
   const all = load();
   const prevHash = all.length ? all[all.length - 1].hash : 'sha256:genesis';
-  const rec = { id: 'urn:uuid:' + crypto.randomUUID(), seq: all.length + 1, ...ev, prevHash };
+  const rec = { id: 'urn:uuid:' + crypto.randomUUID(), seq: all.length + 1, recordedAt: new Date().toISOString(), ...ev, prevHash };
   rec.hash = digest(prevHash, rec);
   fs.appendFileSync(FILE, JSON.stringify(rec) + '\n');
   return rec;

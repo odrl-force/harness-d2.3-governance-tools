@@ -1,6 +1,5 @@
 {
   "type": "PolicyRemoved",
-  "time": "2026-11-04T10:05:00Z",
   "correlation": "setup",
   "resource": "http://localhost:3000/anna/energy/meter-readings",
   "owner": "http://localhost:3000/anna/profile/card#me",

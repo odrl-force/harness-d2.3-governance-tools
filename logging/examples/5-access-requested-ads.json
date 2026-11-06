@@ -1,9 +1,8 @@
 {
   "type": "AccessRequested",
-  "time": "2026-11-04T10:30:00Z",
   "correlation": "req-2",
   "resource": "http://localhost:3000/anna/energy/meter-readings",
-  "colour": "blue",
+  "owner": "http://localhost:3000/anna/profile/card#me",
   "source": "run-script",
   "requester": "http://localhost:3000/enerco/profile/card#me",
   "action": "http://www.w3.org/ns/odrl/2/read",
