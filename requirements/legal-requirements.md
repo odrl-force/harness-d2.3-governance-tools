@@ -121,7 +121,7 @@ BE: currently I don't see the need for D3 (data intermediation) unless you add t
 
 1. Confirm this requirements list with Beatriz & Harsh
 2. Mapping table filled from architecture.md (unverified until the evaluator runs). G5, G6 and DA1 still TBD. Re-check after the evaluator run
-3. Discuss with Beatriz-Joachim which requirements affect the authorizer (Joachim knows UMA best)
+3. Discuss with Beatriz-Joanna which requirements affect the authorizer (Joanna knows UMA best)
 4. Discuss with Beatriz-Wout which requirements affect the policy engine (Wout knows ODRL evaluator best)
 5. Confirm the "must-have" list is achievable by end of November
 6. Start architecture diagram based on confirmed requirements
