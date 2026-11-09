@@ -1,8 +1,4 @@
-# D2.3 - Solid pods and data spaces
-
-**HARNESS: Deliverable D2.3 - Tools for Governance of Data and AI Services**  
-
-Proof-of-concept: a citizen's data flows from her Solid pod into a data space only as her machine-readable policies allow. Every decision is recorded so she and, e.g.,  an auditor, can check it afterwards
+# HARNESS: Deliverable D2.3 - Tools for Governance of Data and AI Services
 
 ## What this does
 
@@ -11,8 +7,7 @@ A person (here Anna) keeps here smart-meter readings in her Solid pod and writes
 1. Discovery: The participant finds Anna's dataset in the data space's catalogue which lists the purposes she accepts.
 2. Request: The participant's asks the pod and is sent to Anna's authorisation server where it states who it is and its purpose.
 3. Decision: The auth. server evaluates Anna's policies, the purpose and any existing constraints (e.g., temporal). Refusal or token granting occurs here.
-4. Record: Each step is recorded via a logging component which includes an UI where Anna can read the different logged activities.
-
+4. Record: each step goes to the logging server and Anna reads it on her log page.
 
 ## Architecture
 
@@ -58,73 +53,17 @@ flowchart LR
 
 ## Quick start
 
+Needs Linux or WSL, Python 3.8+ and Node.js 20 to 24.
 
-Generate the synthetic meter data (Python 3.8 or later, standard library only):
 ```bash
-# Clone this repo
-git clone https://github.com/odrl-force/harness-d2.3-governance-tools.git
+git clone --recurse-submodules https://github.com/odrl-force/harness-d2.3-governance-tools.git
 cd harness-d2.3-governance-tools
-python demo/generate_meter_data.py --synthetic
+python3 demo/generate_meter_data.py --synthetic   # synthetic meter data
+bash stack/start.sh                               # pod and UMA
 ```
-
-### Run the pod and the authorisation server
-
-The pod (Community Solid Server - CSS) and the authorisation server (UMA) are sourced from IDLab's
-[user-managed-access](https://github.com/SolidLabResearch/user-managed-access) repository.
-It is included as a git submodule in `external/user-managed-access`, pinned to commit
-4c4134f (14 October 2026).
-
-
-    git clone --recurse-submodules https://github.com/odrl-force/harness-d2.3-governance-tools.git
-    cd harness-d2.3-governance-tools
-    bash stack/start.sh
-
-The first run installs and builds IDLab's code. When it says "Both servers are up", Anna's
-profile is at http://localhost:3000/anna/profile/card. Stop with Ctrl+C. If you cloned
-without `--recurse-submodules`, run `git submodule update --init` once. The accounts in
-`stack/seed.json` and their password are for a local demo only.
-
 
 [TODO]
 Instructions for the other components are added as each one is reviewed and merged.
-
-## Project structure
-
-```
-.
-├── README.md
-├── LICENSE                    # MIT
-├── docs/
-│   ├── architecture.md        # draft, being updated
-│   └── demo-scenario.md       # draft, being updated
-├── requirements/
-│   └── legal-requirements.md  # draft, awaiting review
-├── demo/
-│   ├── README.md              # data synthesis process
-│   ├── generate_meter_data.py
-│   └── meter-readings.ttl
-├── policies/
-│   ├── README.md              # what each policy does, why
-│   ├── p0-anna-owner.ttl
-│   ├── p1-altruism-city.ttl
-│   ├── p2-commercial-enerco.ttl
-│   ├── p3-no-marketing.ttl
-│   └── shared/
-│       └── parties-and-assets.ttl
-├── logging/
-│   ├── README.md              # how to run and try it
-│   ├── log-model.md
-│   ├── event.schema.json
-│   ├── context.jsonld
-│   ├── server.mjs
-│   ├── ui.html                # Anna's log page
-│   └── examples/
-├── stack/
-│   ├── start.sh               # starts the pod and UMA
-│   └── seed.json              # demo accounts for anna, ghent, enerco, other
-└── external/
-    └── user-managed-access/   # UMA and pod
-````
 
 ## Components used
 
@@ -138,7 +77,13 @@ Instructions for the other components are added as each one is reviewed and merg
 
 ## Components created for D2.3
 
-TODO: create table similar to the one above once the new components are created
+
+| Component | Role | Maintainer | Repository |
+| --------- | ---- | ---------- | ---------- |
+| Logging   |      |            |            |
+| Client    |      |            |            |
+| Catalogue |      |            |            |
+
 
 ## Use case
 
@@ -147,15 +92,14 @@ Utility data in a smart city. Anna's monthly electricity readings sit in her pod
 - **Flow 1, data altruism (DGA).** The City of Ghent reads them to improve public services,
   until a set date. Whether the City should be presented as a recognised data altruism
   organisation is under discussion.
-- **Flow 2, sharing at the user's request (Data Act Art. 5).** A company Anna chooses reads
-  them to advise her on her energy use. Requester and policy to be defined.
+- **Flow 2, sharing at the user's request (Data Act Art. 5).** EnerCo, a made-up
+  energy-advice company, reads them to advise her on her energy use.
 - **Refusal.** Nobody may read them for marketing or advertising.
 
 ## Related work
 
 - [DPV-ODRL Profile](https://dev.dpvcg.org/mappings/odrl/)
 - [Data Privacy Vocabulary (DPV)](https://w3id.org/dpv)
-- [TBD]
 
 ## Team
 
@@ -171,10 +115,6 @@ Utility data in a smart city. Anna's monthly electricity readings sit in her pod
 | Sheyla Leyva-Sánchez    | UPM              | [TBD]                                     |
 | Victoria Wiegand        | ADAPT-TCD        | [TBD]                                     |
 
-
-## License
-
-[MIT License](LICENSE)
 
 ## Acknowledgements
 
