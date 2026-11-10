@@ -62,8 +62,6 @@ python3 demo/generate_meter_data.py --synthetic   # synthetic meter data
 bash stack/start.sh                               # pod and UMA
 ```
 
-[TODO]
-Instructions for the other components are added as each one is reviewed and merged.
 
 ## Components used
 
