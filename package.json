@@ -1,0 +1,27 @@
+{
+  "name": "harness-d2.3-governance-tools",
+  "version": "0.1.0",
+  "description": "HARNESS D2.3 demonstrator: policy-governed access to personal data in a data space with an audit log for the data subject.",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "author": "Marlin Kisia",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "typecheck": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/odrl-force/harness-d2.3-governance-tools.git"
+  },
+  "bugs": {
+    "url": "https://github.com/odrl-force/harness-d2.3-governance-tools/issues"
+  },
+  "homepage": "https://github.com/odrl-force/harness-d2.3-governance-tools#readme",
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "typescript": "^7.0.2"
+  }
+}
