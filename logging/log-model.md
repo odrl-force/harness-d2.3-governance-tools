@@ -3,7 +3,7 @@
 Marlin 2026-10-30
 
 Files in this folder: `event.schema.json` (what an event must contain), `context.jsonld`
-(what each field means in RDF), `server.mjs` (stores and serves events), `ui.html` (Anna's page).
+(what each field means in RDF), `server.mts` (stores and serves events), `ui.html` (Anna's page).
 
 ## What the log is for
 
