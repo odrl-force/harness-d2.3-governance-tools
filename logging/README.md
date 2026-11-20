@@ -1,20 +1,19 @@
 # Logging component
 
-Records what happens to Anna's data: which policies she added or removed, who asked for the
-data and why, what was decided and by which rule and whether the data was read. Anna reads
-the record on a web page. Each entry carries a fingerprint of the one before it so a changed
-or deleted entry shows.
+Stores events about Anna's data in a hash-chained log and shows them on Anna's page.
 
 
 ## Run it
 
-From the repository root:
+From the repository root, after `npm install`:
 
 ```bash
-node logging/server.mjs
+node logging/server.mts
 ```
 
 Open http://localhost:5100/ for Anna's page. Stop the server with Ctrl+C.
+
+Options: `--port` (default 5100), `--file` (default `logging/data/events.jsonl`).
 
 ## Try it
 
@@ -24,14 +23,6 @@ In a second terminal, from the repository root, send the seven example events in
 for f in logging/examples/[1-7]-*.json; do
   curl -s -X POST http://localhost:5100/events -H "content-type: application/json" -d @"$f"; echo; sleep 1
 done
-```
-
-Reload the page: Anna adds a rule, the City asks, is allowed and reads, EnerCo asks for advertising and is refused and Anna removes her rule.
-
-Send an event that breaks the rules and the server refuses it with a list of what is wrong:
-
-```bash
-curl -s -X POST http://localhost:5100/events -H "content-type: application/json" -d @logging/examples/bad-event.json
 ```
 
 BE: question should we keep a log of events gone wrong?
@@ -44,6 +35,18 @@ BE: question should we keep a log of events gone wrong?
 
 This shows the log is tamper-evident: an edit to an old entry is detected and located. Whoever
 runs the server could still rewrite the whole file.
+Run one server per log file.
+
+
+## Endpoints
+
+| Request              | Does                                                                              |
+| -------------------- | --------------------------------------------------------------------------------- |
+| `POST /events`       | adds one event; 201 with the stored record, or 400 with the errors                |
+| `GET /events`        | all events, oldest first; filters `requester`, `resource`, `correlation`, `owner` |
+| `GET /events.jsonld` | the same as JSON-LD                                                               |
+| `GET /verify`        | checks the hash chain                                                             |
+| `GET /`              | Anna's page                                                                       |
 
 BE: we should have policies on who can read and write logs. logs should not be updatable, it should only be possible to create new ones.
 BE: http://localhost:5100/ now shows "Warning: entry 3 has been changed or removed after it was written."

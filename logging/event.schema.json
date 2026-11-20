@@ -19,7 +19,7 @@
     "requester": { "type": "string", "format": "uri", "description": "WebID of the requesting party." },
     "action": { "type": "string", "format": "uri" },
     "purposes": { "type": "array", "items": { "type": "string", "format": "uri" }, "description": "DPV purposes the requester declared." },
-    "claimTypes": { "type": "array", "items": { "type": "string" }, "description": "Kinds of claims shown (webid, purpose, legal basis, credential). Never their content." },
+    "claimTypes": { "type": "array", "items": { "enum": ["webid", "purpose", "legal basis", "credential"] }, "description": "Kinds of claims shown. Never their content." },
     "policy": {
       "type": "object", "additionalProperties": false,
       "properties": { "id": { "type": "string", "format": "uri" }, "hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" } }
