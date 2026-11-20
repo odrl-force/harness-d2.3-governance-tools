@@ -42,7 +42,7 @@ const schema = JSON.parse(fs.readFileSync(here + 'event.schema.json', 'utf8'));
 const context = JSON.parse(fs.readFileSync(here + 'context.jsonld', 'utf8'));
 fs.mkdirSync(path.dirname(FILE), { recursive: true });
 
-// ajv and ajv-formats are CommonJS: Node accepts the plain default import, TypeScript under nodenext only `.default`.
+
 const ajv = new Ajv2020.default({ allErrors: true });
 addFormats.default(ajv);
 const validate = ajv.compile<LogEvent>(schema);
@@ -62,7 +62,6 @@ function check(ev: unknown): string[] {
       errors.push(`${e.instancePath || '/'} ${e.message}${extra}${allowed}`);
     }
   }
-  // The schema lists the server-set fields so stored records validate, which means Ajv lets a sender set them.
   if (ev && typeof ev === 'object') {
     for (const k of Object.keys(ev)) if (SERVER_SET.includes(k)) errors.push(`/${k} is set by the server`);
   }
