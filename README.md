@@ -1,5 +1,7 @@
 # HARNESS: Deliverable D2.3 - Tools for Governance of Data and AI Services
 
+Work in progress. First release (v0.1.0) planned for 27 November 2026.
+
 ## What this does
 
 A person (here Anna) keeps her smart-meter readings in her Solid pod and writes policies on who may read them and why. When a participant in a data space wants her data:
@@ -45,7 +47,7 @@ flowchart LR
 | Logging component                | draft                        | [logging](./logging/)           |
 | Pod and authorisation server     | runs from a pinned submodule | [stack](./stack/)               |
 | Catalogue                        | draft                        | [catalog](./catalog/)           |
-| Client and run script            | client draft, script planned | [client](./client/)             |
+| Client and start script          | draft                        | [client](./client/)             |
 | Policies and test cases          | draft                        | [policies](./policies/)         |
 | Setup guide, screencast, release | planned (by 27 November)     |                                 |
 
@@ -80,12 +82,12 @@ npm run story      # the demo; Anna's page is at http://localhost:5100/
 
 ## Components created for D2.3
 
-
-| Component | Role | Maintainer | Repository |
-| --------- | ---- | ---------- | ---------- |
-| Logging   |      |            |            |
-| Client    |      |            |            |
-| Catalogue |      |            |            |
+| Component    | Role                                                         | Folder     |
+| ------------ | ------------------------------------------------------------ | ---------- |
+| Logging      | hash-chained event log and Anna's page                       | `logging/` |
+| Catalogue    | DCAT catalogue with ODRL offers                              | `catalog/` |
+| Client       | plays the demo story and names the rule behind each decision | `client/`  |
+| Start script | starts the pod, UMA, catalogue and logging with one command  | `stack/`   |
 
 
 ## Use case
@@ -106,17 +108,17 @@ Utility data in a smart city. Anna's monthly electricity readings sit in her pod
 
 ## Team
 
-| Name                    | Affiliation      | Role                                      |
-| ----------------------- | ---------------- | ----------------------------------------- |
-| Marlin Kisia            | UGent-IDLab-imec | Lead, requirements, implementation        |
-| Beatriz Esteves         | UGent-IDLab-imec | Supervisor-Reviewer, ODRL/Solid expertise |
-| Meem Arafat Manab       | UPM              | [TBD]                                     |
-| Víctor Rodríguez-Doncel | UPM              | Project coordinator, submission           |
-| Harshvardhan Pandit     | ADAPT-TCD        | WP2 Coordinator-Reviewer                  |
-| Célestine Lecat         | UNIBO            | [TBD]                                     |
-| Fabian Linde            | UPM              | [TBD]                                     |
-| Sheyla Leyva-Sánchez    | UPM              | [TBD]                                     |
-| Victoria Wiegand        | ADAPT-TCD        | [TBD]                                     |
+| Name                    | Affiliation      | Role                               |
+| ----------------------- | ---------------- | ---------------------------------- |
+| Marlin Kisia            | UGent-IDLab-imec | Lead, requirements, implementation |
+| Beatriz Esteves         | UGent-IDLab-imec | Supervisor-Reviewer                |
+| Meem Arafat Manab       | UPM              | Catalogue                          |
+| Víctor Rodríguez-Doncel | UPM              | Project coordinator, submission    |
+| Harshvardhan Pandit     | ADAPT-TCD        | WP2 Coordinator-Reviewer           |
+| Célestine Lecat         | UNIBO            | Legal requirements                 |
+| Fabian Linde            | UPM              | Fresh-clone testing                |
+| Sheyla Leyva-Sánchez    | UPM              | Client                             |
+| Victoria Wiegand        | ADAPT-TCD        | Deliverable text                   |
 
 
 ## Acknowledgements
