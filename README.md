@@ -2,10 +2,10 @@
 
 ## What this does
 
-A person (here Anna) keeps here smart-meter readings in her Solid pod and writes policies on who may read them and why. When a participant in a data space wants her data:
+A person (here Anna) keeps her smart-meter readings in her Solid pod and writes policies on who may read them and why. When a participant in a data space wants her data:
 
 1. Discovery: The participant finds Anna's dataset in the data space's catalogue which lists the purposes she accepts.
-2. Request: The participant's asks the pod and is sent to Anna's authorisation server where it states who it is and its purpose.
+2. Request: The participant asks the pod and is sent to Anna's authorisation server where it states who it is and its purpose.
 3. Decision: The auth. server evaluates Anna's policies, the purpose and any existing constraints (e.g., temporal). Refusal or token granting occurs here.
 4. Record: each step goes to the logging server and Anna reads it on her log page.
 
@@ -45,8 +45,8 @@ flowchart LR
 | Synthetic meter data             | done                         | [demo](./demo/)                 |
 | Logging component                | draft                        | [logging](./logging/)           |
 | Pod and authorisation server     | runs from a pinned submodule | [stack](./stack/)               |
-| Catalogue                        | planned (week of 9 November) |                                 |
-| Client and run script            | planned                      |                                 |
+| Catalogue                        | draft                        | [catalog](./catalog/)           |
+| Client and run script            | client draft, script planned | [client](./client/)             |
 | Policies and test cases          | draft                        | [policies](./policies/)         |
 | Setup guide, screencast, release | planned (by 27 November)     |                                 |
 
