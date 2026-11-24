@@ -48,7 +48,6 @@ const schema = JSON.parse(fs.readFileSync(here + 'event.schema.json', 'utf8'));
 const context = JSON.parse(fs.readFileSync(here + 'context.jsonld', 'utf8'));
 fs.mkdirSync(path.dirname(FILE), { recursive: true });
 
-// ajv and ajv-formats are CommonJS: Node accepts the plain default import, TypeScript under nodenext only `.default`.
 const ajv = new Ajv2020.default({ allErrors: true });
 addFormats.default(ajv);
 const validate = ajv.compile<LogEvent>(schema);
@@ -68,7 +67,6 @@ function check(ev: unknown): string[] {
       errors.push(`${e.instancePath || '/'} ${e.message}${extra}${allowed}`);
     }
   }
-  // The schema lists the server-set fields so stored records validate, which means Ajv lets a sender set them.
   if (ev && typeof ev === 'object') {
     for (const k of Object.keys(ev)) if (SERVER_SET.includes(k)) errors.push(`/${k} is set by the server`);
   }
@@ -152,6 +150,6 @@ const server = http.createServer((req, res) => {
   if (req.method === 'GET' && url.pathname === '/') return send(res, 200, fs.readFileSync(here + 'ui.html', 'utf8'), 'text/html; charset=utf-8');
   send(res, 404, { error: 'not found' });
 });
-// Keep idle connections open for 65 seconds. 
+// Keep idle connections open for 65 seconds.
 server.keepAliveTimeout = 65_000;
 server.listen(PORT, () => console.log(`D2.3 logging server on http://localhost:${PORT} (file ${FILE})`));
