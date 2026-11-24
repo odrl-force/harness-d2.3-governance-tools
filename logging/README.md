@@ -36,6 +36,7 @@ BE: question should we keep a log of events gone wrong?
 This shows the log is tamper-evident: an edit to an old entry is detected and located. Whoever
 runs the server could still rewrite the whole file.
 Run one server per log file.
+Refused events go to a separate file next to the log (`events.rejected.jsonl`) with their own hash chain. They keep the errors and the body's hash and size.
 
 
 ## Endpoints
@@ -47,6 +48,7 @@ Run one server per log file.
 | `GET /events.jsonld` | the same as JSON-LD                                                               |
 | `GET /verify`        | checks the hash chain                                                             |
 | `GET /`              | Anna's page                                                                       |
+| `GET /rejected`      | refused events; filter `owner`                                                    |
 
 BE: we should have policies on who can read and write logs. logs should not be updatable, it should only be possible to create new ones.
 BE: http://localhost:5100/ now shows "Warning: entry 3 has been changed or removed after it was written."

@@ -23,10 +23,11 @@
 </head>
 <body>
 <h1>Who asked for your meter readings</h1>
-<p class="lead">Each request, what was decided and why with newest first. Changes to your rules are listed as well.</p>
+<p class="lead">Each request, what was decided and why, newest first. Your own actions are listed as well.</p>
 <p class="chain" id="chain">Checking the log…</p>
-<p><label for="who">Show</label>
-  <select id="who"><option value="">everyone</option></select></p>
+<p class="chain" id="refused" hidden></p>
+<p><label for="who">Requests from</label>
+  <select id="who"><option value="">all parties</option></select></p>
 <div id="list"></div>
 <script>
 const NAMES = {
@@ -41,6 +42,7 @@ const PURPOSES = {
   TargetedAdvertising: 'targeted advertising', DirectMarketing: 'direct marketing', CommercialPurpose: 'commercial purposes',
   ResearchAndDevelopment: 'research and development', ScientificResearch: 'scientific research',
 };
+const OWNER = 'http://localhost:3000/anna/profile/card#me';
 const nameOf = (iri) => NAMES[iri] ?? iri;
 const purposeOf = (iri) => PURPOSES[iri.split('#').pop()] ?? iri;
 const RULES = {
@@ -60,18 +62,25 @@ const day = (t) => new Date(t).toLocaleDateString('en-GB', { dateStyle: 'medium'
 const clock = (t) => new Date(t).toLocaleTimeString('en-GB', { timeStyle: 'medium' });
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
+// The sender's own time is kept apart from the server's; show it when they differ by more than a minute.
+const claimed = (e) => e.time && e.recordedAt && Math.abs(new Date(e.time) - new Date(e.recordedAt)) > 60_000
+  ? ` <span class="small">(the sender gives ${day(e.time)}, ${clock(e.time)})</span>` : '';
+
 function sentence(e) {
   const who = esc(nameOf(e.requester ?? ''));
   switch (e.type) {
     case 'PolicyCreated': return `You added a rule: ${esc(ruleOf(e.policy?.id ?? ''))}.`;
     case 'PolicyRemoved': return `You removed a rule: ${esc(ruleOf(e.policy?.id ?? ''))}.`;
-    case 'AccessRequested': return `${who} asked to ${e.action?.endsWith('write') ? 'change' : 'read'} the data`
+    case 'AccessRequested':
+      if (e.requester === OWNER) return `You asked to ${e.action?.endsWith('write') ? 'store new readings' : 'read your readings'}.`;
+      return `${who} asked to ${e.action?.endsWith('write') ? 'change' : 'read'} the data`
       + (e.purposes?.length ? ` for ${e.purposes.map(purposeOf).map(esc).join(' and ')}.` : ', without saying why.');
     case 'DecisionMade': {
       const d = e.decision === 'granted' ? '<span class="outcome-granted">Allowed</span>' : e.decision === 'need_info' ? 'More information asked' : 'Refused';
       let rules = '';
       if (e.rules?.length) rules = ` Your rule: ${[...new Set(e.rules.map(ruleOf))].map(esc).join('; ')}.`;
       else if (e.decision !== 'granted') rules = ' No rule allows this request.';
+      if (e.requester === OWNER) rules = '';
       const warn = (e.note ?? '').includes('MISMATCH') ? ' <strong>Warning: this decision does not match your rules.</strong>' : '';
       return `${d}.${rules}${warn}`;
     }
@@ -83,10 +92,14 @@ function sentence(e) {
 }
 
 async function load() {
-  const [events, chain] = await Promise.all([fetch('/events').then((r) => r.json()), fetch('/verify').then((r) => r.json())]);
+  const [events, chain, refused] = await Promise.all([fetch('/events').then((r) => r.json()), fetch('/verify').then((r) => r.json()),
+    fetch('/rejected?owner=' + encodeURIComponent(OWNER)).then((r) => r.json())]);
   document.getElementById('chain').textContent = chain.ok
     ? `${chain.records} entries. None has been changed or removed since it was written.`
     : `Warning: entry ${chain.brokenAt} has been changed or removed after it was written.`;
+  const r = document.getElementById('refused');
+  r.hidden = refused.length === 0;
+  r.textContent = `${refused.length} ${refused.length === 1 ? 'entry naming you was' : 'entries naming you were'} refused because they were malformed. They are kept apart and not shown here.`;
   const sel = document.getElementById('who');
   for (const r of [...new Set(events.map((e) => e.requester).filter(Boolean))]) {
     if (![...sel.options].some((o) => o.value === r)) sel.add(new Option(nameOf(r), r));
@@ -94,15 +107,16 @@ async function load() {
   const groups = new Map();
   for (const e of events) {
     if (sel.value && e.requester && e.requester !== sel.value) continue;
-    if (sel.value && !e.requester) continue;
+    if (sel.value && !e.requester && sel.value !== OWNER) continue;
     if (!groups.has(e.correlation)) groups.set(e.correlation, []);
     groups.get(e.correlation).push(e);
   }
   const html = [...groups.entries()].reverse().map(([id, list]) => {
     const first = list[0];
-    const title = id === 'setup' ? 'Changes to your rules' : `${esc(nameOf(first.requester ?? ''))}, ${day(first.recordedAt ?? first.time)}`;
-    return `<section class="attempt"><h2>${title}</h2><ol>${list.map((e) => `<li>${sentence(e)} <span class="small">${clock(e.recordedAt ?? e.time)}</span></li>`).join('')}</ol>`
-      + `<p class="small">Recorded by ${esc(first.source)}${first.note ? ': ' + esc(first.note) : ''}</p></section>`;
+    const mine = id === 'setup' || first.requester === OWNER;
+    const title = `${mine ? 'Your actions' : esc(nameOf(first.requester ?? ''))}, ${day(first.recordedAt ?? first.time)}`;
+    return `<section class="attempt"><h2>${title}</h2><ol>${list.map((e) => `<li>${sentence(e)} <span class="small">${clock(e.recordedAt ?? e.time)}</span>${claimed(e)}</li>`).join('')}</ol>`
+      + `<p class="small">Recorded by ${esc(first.source)}${first.note && id !== 'setup' ? ': ' + esc(first.note) : ''}</p></section>`;
   }).join('');
   document.getElementById('list').innerHTML = html || '<p>Nothing yet.</p>';
 }

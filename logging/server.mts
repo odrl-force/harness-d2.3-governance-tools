@@ -27,6 +27,11 @@ type LogEvent = {
 
 type LogRecord = LogEvent & { id: string; seq: number; recordedAt: string; prevHash: string; hash: string };
 
+type Rejection = {
+  seq: number; receivedAt: string; from: string; owner?: string; errors: string[];
+  body: { sha256: string; bytes: number }; prevHash: string; hash: string;
+};
+
 const here = fileURLToPath(new URL('./', import.meta.url)); // fileURLToPath also works on Windows
 const { values: opts } = parseArgs({
   options: {
@@ -36,22 +41,23 @@ const { values: opts } = parseArgs({
 });
 const PORT = Number(opts.port);
 const FILE = opts.file;
+const REJECTED = FILE.replace(/(\.jsonl)?$/, '.rejected.jsonl');
 const SERVER_SET = ['id', 'seq', 'recordedAt', 'prevHash', 'hash'];
 
 const schema = JSON.parse(fs.readFileSync(here + 'event.schema.json', 'utf8'));
 const context = JSON.parse(fs.readFileSync(here + 'context.jsonld', 'utf8'));
 fs.mkdirSync(path.dirname(FILE), { recursive: true });
 
-
+// ajv and ajv-formats are CommonJS: Node accepts the plain default import, TypeScript under nodenext only `.default`.
 const ajv = new Ajv2020.default({ allErrors: true });
 addFormats.default(ajv);
 const validate = ajv.compile<LogEvent>(schema);
 
-const load = (): LogRecord[] =>
-  fs.existsSync(FILE) ? fs.readFileSync(FILE, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l)) : [];
+const load = <T extends { seq: number; prevHash: string; hash: string } = LogRecord>(file = FILE): T[] =>
+  fs.existsSync(file) ? fs.readFileSync(file, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l)) : [];
 const digest = (prevHash: string, rec: object) =>
   'sha256:' + crypto.createHash('sha256').update(prevHash + '\n' + JSON.stringify(rec)).digest('hex');
-const strip = ({ hash, ...rest }: LogRecord) => rest;
+const strip = ({ hash, ...rest }: { hash: string }) => rest;
 
 function check(ev: unknown): string[] {
   const errors: string[] = [];
@@ -62,6 +68,7 @@ function check(ev: unknown): string[] {
       errors.push(`${e.instancePath || '/'} ${e.message}${extra}${allowed}`);
     }
   }
+  // The schema lists the server-set fields so stored records validate, which means Ajv lets a sender set them.
   if (ev && typeof ev === 'object') {
     for (const k of Object.keys(ev)) if (SERVER_SET.includes(k)) errors.push(`/${k} is set by the server`);
   }
@@ -77,8 +84,22 @@ function append(ev: LogEvent): LogRecord {
   return stored;
 }
 
-function verify() {
-  const all = load();
+// Refused events go to their own file, outside Anna's chain: anyone can name her as owner.
+// The body itself is not kept, since it can hold anything; its hash and size identify it.
+function reject(body: string, from: string, errors: string[]) {
+  const all = load<Rejection>(REJECTED);
+  const prevHash = all.length ? all[all.length - 1].hash : 'sha256:genesis';
+  let owner: string | undefined;
+  try { const o = JSON.parse(body)?.owner; if (typeof o === 'string') owner = o; } catch { /* not JSON */ }
+  const rec = {
+    seq: all.length + 1, receivedAt: new Date().toISOString(), from, ...(owner ? { owner } : {}), errors,
+    body: { sha256: crypto.createHash('sha256').update(body).digest('hex'), bytes: Buffer.byteLength(body) }, prevHash,
+  };
+  fs.appendFileSync(REJECTED, JSON.stringify({ ...rec, hash: digest(prevHash, rec) }) + '\n');
+}
+
+function verify(file = FILE) {
+  const all = load(file);
   let prev = 'sha256:genesis';
   for (const r of all) {
     if (r.prevHash !== prev || digest(prev, strip(r)) !== r.hash) return { ok: false, brokenAt: r.seq };
@@ -103,9 +124,13 @@ const server = http.createServer((req, res) => {
     req.on('data', (c) => (body += c));
     req.on('end', () => {
       let ev: unknown;
-      try { ev = JSON.parse(body); } catch { return send(res, 400, { error: 'body is not JSON' }); }
+      const from = req.socket.remoteAddress ?? 'unknown';
+      try { ev = JSON.parse(body); } catch { reject(body, from, ['body is not JSON']); return send(res, 400, { error: 'body is not JSON' }); }
       const errors = check(ev);
-      if (errors.length) return send(res, 400, { error: 'event does not match event.schema.json', details: errors });
+      if (errors.length) {
+        reject(body, from, errors);
+        return send(res, 400, { error: 'event does not match event.schema.json', details: errors });
+      }
       send(res, 201, append(ev as LogEvent));
     });
     return;
@@ -119,7 +144,11 @@ const server = http.createServer((req, res) => {
     if (url.pathname.endsWith('.jsonld')) return send(res, 200, { ...context, '@graph': all }, 'application/ld+json');
     return send(res, 200, all);
   }
-  if (req.method === 'GET' && url.pathname === '/verify') return send(res, 200, verify());
+  if (req.method === 'GET' && url.pathname === '/verify') return send(res, 200, { ...verify(), rejected: verify(REJECTED) });
+  if (req.method === 'GET' && url.pathname === '/rejected') {
+    const owner = url.searchParams.get('owner');
+    return send(res, 200, load<Rejection>(REJECTED).filter((r) => !owner || r.owner === owner));
+  }
   if (req.method === 'GET' && url.pathname === '/') return send(res, 200, fs.readFileSync(here + 'ui.html', 'utf8'), 'text/html; charset=utf-8');
   send(res, 404, { error: 'not found' });
 });
