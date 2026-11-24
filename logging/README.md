@@ -25,7 +25,6 @@ for f in logging/examples/[1-7]-*.json; do
 done
 ```
 
-BE: question should we keep a log of events gone wrong?
 
 ## Check that the log has not been changed
 
@@ -50,9 +49,4 @@ Refused events go to a separate file next to the log (`events.rejected.jsonl`) w
 | `GET /`              | Anna's page                                                                       |
 | `GET /rejected`      | refused events; filter `owner`                                                    |
 
-BE: we should have policies on who can read and write logs. logs should not be updatable, it should only be possible to create new ones.
-BE: http://localhost:5100/ now shows "Warning: entry 3 has been changed or removed after it was written."
 
-BE: I would expect every entry to show a timestamp
-BE: it's not 'everyone' right? it's Ana because it's her data/policies so she can see everything
-BE: 'Your rules' could be 'Your actions' because Anna should also be able to see when data was added or altered -- not a problem for now, but with some time this might be a very long list so filters will be needed, e.g., to only see policy logs, or data logs, or even data update logs (e.g., to catch unwanted data updates)
