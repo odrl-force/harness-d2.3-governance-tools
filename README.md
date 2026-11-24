@@ -41,7 +41,6 @@ flowchart LR
 | Part                             | State                        | Where                           |
 | -------------------------------- | ---------------------------- | ------------------------------- |
 | Legal requirements               | draft                        | [requirements](./requirements/) |
-| Scenario and architecture        | draft                        | [docs](./docs/)                 |
 | Synthetic meter data             | done                         | [demo](./demo/)                 |
 | Logging component                | draft                        | [logging](./logging/)           |
 | Pod and authorisation server     | runs from a pinned submodule | [stack](./stack/)               |
