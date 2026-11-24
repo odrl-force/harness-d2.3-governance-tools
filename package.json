@@ -10,7 +10,9 @@
     "node": ">=24"
   },
   "scripts": {
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "start": "node stack/start.mts",
+    "story": "node client/story.mts"
   },
   "repository": {
     "type": "git",

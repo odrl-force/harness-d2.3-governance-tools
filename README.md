@@ -53,13 +53,19 @@ flowchart LR
 
 ## Quick start
 
-Needs Linux or WSL, Python 3.8+ and Node.js 20 to 24.
+Needs Linux or WSL, Git and Node.js 24.
 
 ```bash
 git clone --recurse-submodules https://github.com/odrl-force/harness-d2.3-governance-tools.git
 cd harness-d2.3-governance-tools
-python3 demo/generate_meter_data.py --synthetic   # synthetic meter data
-bash stack/start.sh                               # pod and UMA
+npm install
+npm start          # pod, UMA, catalogue and logging server
+```
+
+Then, in a second terminal:
+
+```bash
+npm run story      # the demo; Anna's page is at http://localhost:5100/
 ```
 
 
