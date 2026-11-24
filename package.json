@@ -26,6 +26,9 @@
   },
   "dependencies": {
     "ajv": "^8.20.0",
-    "ajv-formats": "^3.0.1"
+    "ajv-formats": "^3.0.1",
+    "n3": "1.26.0",
+    "odrl-evaluator": "0.6.0",
+    "policy-conflict-resolver": "0.0.3"
   }
 }
