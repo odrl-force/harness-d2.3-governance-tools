@@ -125,3 +125,4 @@ Utility data in a smart city. Anna's monthly electricity readings sit in her pod
 
 This work is part of the HARNESS project, funded by the European Union under the Marie
 Skłodowska-Curie Actions, grant agreement 101169409.
+Beatriz Esteves is a postdoctoral fellow of the Research Foundation Flanders (12AGB27N).
