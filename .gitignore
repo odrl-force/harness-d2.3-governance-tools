@@ -151,4 +151,5 @@ vite.config.ts.timestamp-*
 # Raw third-party data (UCI, Low Carbon London). Never commit.
 demo/data/
 household_power_consumption.txt
-logging/data/stack/logs/
+logging/data/
+stack/logs/
