@@ -1,0 +1,34 @@
+# P5. Bob may write and read his own energy data, like Anna under P0.
+
+@prefix odrl: <http://www.w3.org/ns/odrl/2/> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix d23:  <http://example.org/d23/> .
+
+# Policy: Bob's own access to his energy data
+d23:policy-p5-bob-owner
+    a               odrl:Agreement ;
+    odrl:uid        d23:policy-p5-bob-owner ;
+    dct:title       "Bob may store, change and read his own energy data"@en ;
+    odrl:permission d23:p5-create , d23:p5-modify , d23:p5-read .
+
+# Permission: Bob may create files in his pod in the energy folder
+d23:p5-create a odrl:Permission ;
+    odrl:action   odrl:create ;
+    odrl:target   <http://localhost:3000/bob/> , <http://localhost:3000/bob/energy/> ,
+                  <http://localhost:3000/bob/energy/meter-readings> ;
+    odrl:assigner <http://localhost:3000/bob/profile/card#me> ;
+    odrl:assignee <http://localhost:3000/bob/profile/card#me> .
+
+# Permission: Bob may change his energy data
+d23:p5-modify a odrl:Permission ;
+    odrl:action   odrl:modify ;
+    odrl:target   <http://localhost:3000/bob/energy/> , <http://localhost:3000/bob/energy/meter-readings> ;
+    odrl:assigner <http://localhost:3000/bob/profile/card#me> ;
+    odrl:assignee <http://localhost:3000/bob/profile/card#me> .
+
+# Permission: Bob may read his energy data
+d23:p5-read a odrl:Permission ;
+    odrl:action   odrl:read ;
+    odrl:target   <http://localhost:3000/bob/energy/> , <http://localhost:3000/bob/energy/meter-readings> ;
+    odrl:assigner <http://localhost:3000/bob/profile/card#me> ;
+    odrl:assignee <http://localhost:3000/bob/profile/card#me> .

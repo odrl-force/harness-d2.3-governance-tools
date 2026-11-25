@@ -1,0 +1,43 @@
+# D2.3 policy P6: Bob lets anyone read his meter readings for scientific research,
+# until 1 January 2028.
+#
+# Requirements: G2 purpose limitation (GDPR Art. 5(1)(b)), G4 storage limitation
+#               (GDPR Art. 5(1)(e)).
+
+@prefix odrl: <http://www.w3.org/ns/odrl/2/> .
+@prefix dpv:  <https://w3id.org/dpv#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix d23:  <http://example.org/d23/> .
+@prefix req:  <http://example.org/d23/requirement/> .
+
+# Policy: Bob's rule for research (a Set: it applies to everyone, so no assignee)
+d23:policy-p6-bob-research
+    a               odrl:Set ;
+    odrl:uid        d23:policy-p6-bob-research ;
+    dct:title       "Anyone may read Bob's meter readings for scientific research"@en ;
+    dct:references  <http://data.europa.eu/eli/reg/2016/679/oj> ;   # GDPR
+    dct:requires    req:G2 , req:G4 ;
+    odrl:permission d23:p6-permission .
+
+# Permission: anyone may read the meter readings on the two conditions below
+d23:p6-permission
+    a               odrl:Permission ;
+    odrl:action     odrl:read ;
+    odrl:target     <http://localhost:3000/bob/energy/meter-readings> ;
+    odrl:assigner   <http://localhost:3000/bob/profile/card#me> ;
+    odrl:constraint d23:p6-purpose , d23:p6-until .
+
+# Condition 1: the stated purpose must be "scientific research"
+d23:p6-purpose
+    a                 odrl:Constraint ;
+    odrl:leftOperand  odrl:purpose ;
+    odrl:operator     odrl:eq ;
+    odrl:rightOperand dpv:ScientificResearch .
+
+# Condition 2: only before 1 January 2028 (UTC)
+d23:p6-until
+    a                 odrl:Constraint ;
+    odrl:leftOperand  odrl:dateTime ;
+    odrl:operator     odrl:lt ;
+    odrl:rightOperand "2028-01-01T00:00:00Z"^^xsd:dateTime .

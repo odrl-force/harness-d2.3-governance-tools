@@ -1,0 +1,168 @@
+@prefix ex:   <http://localhost:3000/bob/energy/meter-readings#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix sosa: <http://www.w3.org/ns/sosa/> .
+@prefix time: <http://www.w3.org/2006/time#> .
+@prefix qudt: <http://qudt.org/schema/qudt/> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+
+# Demo data for HARNESS D2.3. No real person or address.
+# Values invented with a seasonal curve (--synthetic). Not derived from any measurement.
+
+ex:readings a prov:Collection ;
+    dcterms:description "Twelve monthly readings for an invented household. Values come from an invented seasonal curve and are not derived from any measurement."@en ;
+    prov:hadMember ex:obs-2025-01, ex:obs-2025-02, ex:obs-2025-03, ex:obs-2025-04, ex:obs-2025-05, ex:obs-2025-06, ex:obs-2025-07, ex:obs-2025-08, ex:obs-2025-09, ex:obs-2025-10, ex:obs-2025-11, ex:obs-2025-12 .
+
+ex:household-demo-02 a sosa:FeatureOfInterest ;
+    dcterms:description "Demo household (invented)" .
+
+ex:meter-demo-0043 a sosa:Sensor ;
+    sosa:observes ex:electricalEnergyConsumption .
+
+ex:electricalEnergyConsumption a sosa:ObservableProperty ;
+    dcterms:description "Electrical energy consumed by the household over the observation period" .
+
+ex:obs-2025-01 a sosa:Observation ;
+    sosa:madeBySensor ex:meter-demo-0043 ;
+    sosa:observedProperty ex:electricalEnergyConsumption ;
+    sosa:hasFeatureOfInterest ex:household-demo-02 ;
+    sosa:phenomenonTime [ a time:Interval ;
+        time:hasBeginning [ a time:Instant ; time:inXSDDateTimeStamp "2025-01-01T00:00:00Z"^^xsd:dateTimeStamp ] ;
+        time:hasEnd [ a time:Instant ; time:inXSDDateTimeStamp "2025-02-01T00:00:00Z"^^xsd:dateTimeStamp ] ] ;
+    sosa:resultTime "2025-02-01T00:00:00Z"^^xsd:dateTimeStamp ;
+    sosa:hasResult [ a qudt:QuantityValue ;
+        qudt:numericValue "334.45"^^xsd:decimal ;
+        qudt:unit unit:KiloW-HR ] .
+
+ex:obs-2025-02 a sosa:Observation ;
+    sosa:madeBySensor ex:meter-demo-0043 ;
+    sosa:observedProperty ex:electricalEnergyConsumption ;
+    sosa:hasFeatureOfInterest ex:household-demo-02 ;
+    sosa:phenomenonTime [ a time:Interval ;
+        time:hasBeginning [ a time:Instant ; time:inXSDDateTimeStamp "2025-02-01T00:00:00Z"^^xsd:dateTimeStamp ] ;
+        time:hasEnd [ a time:Instant ; time:inXSDDateTimeStamp "2025-03-01T00:00:00Z"^^xsd:dateTimeStamp ] ] ;
+    sosa:resultTime "2025-03-01T00:00:00Z"^^xsd:dateTimeStamp ;
+    sosa:hasResult [ a qudt:QuantityValue ;
+        qudt:numericValue "300.05"^^xsd:decimal ;
+        qudt:unit unit:KiloW-HR ] .
+
+ex:obs-2025-03 a sosa:Observation ;
+    sosa:madeBySensor ex:meter-demo-0043 ;
+    sosa:observedProperty ex:electricalEnergyConsumption ;
+    sosa:hasFeatureOfInterest ex:household-demo-02 ;
+    sosa:phenomenonTime [ a time:Interval ;
+        time:hasBeginning [ a time:Instant ; time:inXSDDateTimeStamp "2025-03-01T00:00:00Z"^^xsd:dateTimeStamp ] ;
+        time:hasEnd [ a time:Instant ; time:inXSDDateTimeStamp "2025-04-01T00:00:00Z"^^xsd:dateTimeStamp ] ] ;
+    sosa:resultTime "2025-04-01T00:00:00Z"^^xsd:dateTimeStamp ;
+    sosa:hasResult [ a qudt:QuantityValue ;
+        qudt:numericValue "294.13"^^xsd:decimal ;
+        qudt:unit unit:KiloW-HR ] .
+
+ex:obs-2025-04 a sosa:Observation ;
+    sosa:madeBySensor ex:meter-demo-0043 ;
+    sosa:observedProperty ex:electricalEnergyConsumption ;
+    sosa:hasFeatureOfInterest ex:household-demo-02 ;
+    sosa:phenomenonTime [ a time:Interval ;
+        time:hasBeginning [ a time:Instant ; time:inXSDDateTimeStamp "2025-04-01T00:00:00Z"^^xsd:dateTimeStamp ] ;
+        time:hasEnd [ a time:Instant ; time:inXSDDateTimeStamp "2025-05-01T00:00:00Z"^^xsd:dateTimeStamp ] ] ;
+    sosa:resultTime "2025-05-01T00:00:00Z"^^xsd:dateTimeStamp ;
+    sosa:hasResult [ a qudt:QuantityValue ;
+        qudt:numericValue "245.01"^^xsd:decimal ;
+        qudt:unit unit:KiloW-HR ] .
+
+ex:obs-2025-05 a sosa:Observation ;
+    sosa:madeBySensor ex:meter-demo-0043 ;
+    sosa:observedProperty ex:electricalEnergyConsumption ;
+    sosa:hasFeatureOfInterest ex:household-demo-02 ;
+    sosa:phenomenonTime [ a time:Interval ;
+        time:hasBeginning [ a time:Instant ; time:inXSDDateTimeStamp "2025-05-01T00:00:00Z"^^xsd:dateTimeStamp ] ;
+        time:hasEnd [ a time:Instant ; time:inXSDDateTimeStamp "2025-06-01T00:00:00Z"^^xsd:dateTimeStamp ] ] ;
+    sosa:resultTime "2025-06-01T00:00:00Z"^^xsd:dateTimeStamp ;
+    sosa:hasResult [ a qudt:QuantityValue ;
+        qudt:numericValue "234.35"^^xsd:decimal ;
+        qudt:unit unit:KiloW-HR ] .
+
+ex:obs-2025-06 a sosa:Observation ;
+    sosa:madeBySensor ex:meter-demo-0043 ;
+    sosa:observedProperty ex:electricalEnergyConsumption ;
+    sosa:hasFeatureOfInterest ex:household-demo-02 ;
+    sosa:phenomenonTime [ a time:Interval ;
+        time:hasBeginning [ a time:Instant ; time:inXSDDateTimeStamp "2025-06-01T00:00:00Z"^^xsd:dateTimeStamp ] ;
+        time:hasEnd [ a time:Instant ; time:inXSDDateTimeStamp "2025-07-01T00:00:00Z"^^xsd:dateTimeStamp ] ] ;
+    sosa:resultTime "2025-07-01T00:00:00Z"^^xsd:dateTimeStamp ;
+    sosa:hasResult [ a qudt:QuantityValue ;
+        qudt:numericValue "209.95"^^xsd:decimal ;
+        qudt:unit unit:KiloW-HR ] .
+
+ex:obs-2025-07 a sosa:Observation ;
+    sosa:madeBySensor ex:meter-demo-0043 ;
+    sosa:observedProperty ex:electricalEnergyConsumption ;
+    sosa:hasFeatureOfInterest ex:household-demo-02 ;
+    sosa:phenomenonTime [ a time:Interval ;
+        time:hasBeginning [ a time:Instant ; time:inXSDDateTimeStamp "2025-07-01T00:00:00Z"^^xsd:dateTimeStamp ] ;
+        time:hasEnd [ a time:Instant ; time:inXSDDateTimeStamp "2025-08-01T00:00:00Z"^^xsd:dateTimeStamp ] ] ;
+    sosa:resultTime "2025-08-01T00:00:00Z"^^xsd:dateTimeStamp ;
+    sosa:hasResult [ a qudt:QuantityValue ;
+        qudt:numericValue "193.01"^^xsd:decimal ;
+        qudt:unit unit:KiloW-HR ] .
+
+ex:obs-2025-08 a sosa:Observation ;
+    sosa:madeBySensor ex:meter-demo-0043 ;
+    sosa:observedProperty ex:electricalEnergyConsumption ;
+    sosa:hasFeatureOfInterest ex:household-demo-02 ;
+    sosa:phenomenonTime [ a time:Interval ;
+        time:hasBeginning [ a time:Instant ; time:inXSDDateTimeStamp "2025-08-01T00:00:00Z"^^xsd:dateTimeStamp ] ;
+        time:hasEnd [ a time:Instant ; time:inXSDDateTimeStamp "2025-09-01T00:00:00Z"^^xsd:dateTimeStamp ] ] ;
+    sosa:resultTime "2025-09-01T00:00:00Z"^^xsd:dateTimeStamp ;
+    sosa:hasResult [ a qudt:QuantityValue ;
+        qudt:numericValue "205.96"^^xsd:decimal ;
+        qudt:unit unit:KiloW-HR ] .
+
+ex:obs-2025-09 a sosa:Observation ;
+    sosa:madeBySensor ex:meter-demo-0043 ;
+    sosa:observedProperty ex:electricalEnergyConsumption ;
+    sosa:hasFeatureOfInterest ex:household-demo-02 ;
+    sosa:phenomenonTime [ a time:Interval ;
+        time:hasBeginning [ a time:Instant ; time:inXSDDateTimeStamp "2025-09-01T00:00:00Z"^^xsd:dateTimeStamp ] ;
+        time:hasEnd [ a time:Instant ; time:inXSDDateTimeStamp "2025-10-01T00:00:00Z"^^xsd:dateTimeStamp ] ] ;
+    sosa:resultTime "2025-10-01T00:00:00Z"^^xsd:dateTimeStamp ;
+    sosa:hasResult [ a qudt:QuantityValue ;
+        qudt:numericValue "218.08"^^xsd:decimal ;
+        qudt:unit unit:KiloW-HR ] .
+
+ex:obs-2025-10 a sosa:Observation ;
+    sosa:madeBySensor ex:meter-demo-0043 ;
+    sosa:observedProperty ex:electricalEnergyConsumption ;
+    sosa:hasFeatureOfInterest ex:household-demo-02 ;
+    sosa:phenomenonTime [ a time:Interval ;
+        time:hasBeginning [ a time:Instant ; time:inXSDDateTimeStamp "2025-10-01T00:00:00Z"^^xsd:dateTimeStamp ] ;
+        time:hasEnd [ a time:Instant ; time:inXSDDateTimeStamp "2025-11-01T00:00:00Z"^^xsd:dateTimeStamp ] ] ;
+    sosa:resultTime "2025-11-01T00:00:00Z"^^xsd:dateTimeStamp ;
+    sosa:hasResult [ a qudt:QuantityValue ;
+        qudt:numericValue "258.19"^^xsd:decimal ;
+        qudt:unit unit:KiloW-HR ] .
+
+ex:obs-2025-11 a sosa:Observation ;
+    sosa:madeBySensor ex:meter-demo-0043 ;
+    sosa:observedProperty ex:electricalEnergyConsumption ;
+    sosa:hasFeatureOfInterest ex:household-demo-02 ;
+    sosa:phenomenonTime [ a time:Interval ;
+        time:hasBeginning [ a time:Instant ; time:inXSDDateTimeStamp "2025-11-01T00:00:00Z"^^xsd:dateTimeStamp ] ;
+        time:hasEnd [ a time:Instant ; time:inXSDDateTimeStamp "2025-12-01T00:00:00Z"^^xsd:dateTimeStamp ] ] ;
+    sosa:resultTime "2025-12-01T00:00:00Z"^^xsd:dateTimeStamp ;
+    sosa:hasResult [ a qudt:QuantityValue ;
+        qudt:numericValue "283.58"^^xsd:decimal ;
+        qudt:unit unit:KiloW-HR ] .
+
+ex:obs-2025-12 a sosa:Observation ;
+    sosa:madeBySensor ex:meter-demo-0043 ;
+    sosa:observedProperty ex:electricalEnergyConsumption ;
+    sosa:hasFeatureOfInterest ex:household-demo-02 ;
+    sosa:phenomenonTime [ a time:Interval ;
+        time:hasBeginning [ a time:Instant ; time:inXSDDateTimeStamp "2025-12-01T00:00:00Z"^^xsd:dateTimeStamp ] ;
+        time:hasEnd [ a time:Instant ; time:inXSDDateTimeStamp "2026-01-01T00:00:00Z"^^xsd:dateTimeStamp ] ] ;
+    sosa:resultTime "2026-01-01T00:00:00Z"^^xsd:dateTimeStamp ;
+    sosa:hasResult [ a qudt:QuantityValue ;
+        qudt:numericValue "323.26"^^xsd:decimal ;
+        qudt:unit unit:KiloW-HR ] .

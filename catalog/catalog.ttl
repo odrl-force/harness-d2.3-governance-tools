@@ -11,7 +11,8 @@
 d23:catalog
     a            dcat:Catalog ;
     dct:title    "D2.3 demo data space catalogue"@en ;
-    dcat:dataset <http://localhost:3000/anna/energy/meter-readings> ;
+    dcat:dataset <http://localhost:3000/anna/energy/meter-readings> ,
+                 <http://localhost:3000/bob/energy/meter-readings> ;
     dcat:service <http://localhost:3000/enerco/services/forecast> .
 
 # Dataset: the resource in Anna's pod
@@ -25,6 +26,19 @@ d23:catalog
 d23:meter-readings-turtle
     a              dcat:Distribution ;
     dcat:accessURL <http://localhost:3000/anna/energy/meter-readings> ;
+    dcat:mediaType <http://www.iana.org/assignments/media-types/text/turtle> .
+
+# Dataset: the resource in Bob's pod
+<http://localhost:3000/bob/energy/meter-readings>
+    a                 dcat:Dataset , odrl:Asset ;
+    dct:title         "Bob's monthly electricity readings"@en ;
+    dct:description   "Twelve monthly readings for Bob's household"@en ;
+    dct:publisher     <http://localhost:3000/bob/profile/card#me> ;
+    dcat:distribution d23:bob-meter-readings-turtle .
+
+d23:bob-meter-readings-turtle
+    a              dcat:Distribution ;
+    dcat:accessURL <http://localhost:3000/bob/energy/meter-readings> ;
     dcat:mediaType <http://www.iana.org/assignments/media-types/text/turtle> .
 
 # Data service: EnerCo's AI forecast. Listed only; nothing answers at its address yet.

@@ -1,7 +1,8 @@
 # Demo data
 
-Twelve monthly electricity readings for one invented household, in Turtle, for Anna's pod.
-No real person, address or meter is involved.
+Twelve monthly electricity readings for each of two invented households, in Turtle: Anna's
+(`meter-readings.ttl`) and Bob's (`bob-meter-readings.ttl`). Persons, addresses, meter readings 
+are all synthetic.
 
 
 ## Make the file
@@ -22,6 +23,14 @@ python demo/generate_meter_data.py --input demo/data/household_power_consumption
 ```
 
 Options: `--base` (the address prefix; it must match `odrl:target` in the policies).
+
+Bob's file:
+
+```bash
+python demo/generate_meter_data.py --synthetic --seed 7 --annual-kwh 3100 \
+  --base 'http://localhost:3000/bob/energy/meter-readings#' \
+  --meter-id meter-demo-0043 --household-id household-demo-02 --out demo/bob-meter-readings.ttl
+```
 
 ## What the numbers are
 

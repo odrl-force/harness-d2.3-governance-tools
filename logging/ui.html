@@ -92,10 +92,12 @@ function sentence(e) {
 }
 
 async function load() {
-  const [events, chain, refused] = await Promise.all([fetch('/events').then((r) => r.json()), fetch('/verify').then((r) => r.json()),
+  const [all, chain, refused] = await Promise.all([fetch('/events').then((r) => r.json()), fetch('/verify').then((r) => r.json()),
     fetch('/rejected?owner=' + encodeURIComponent(OWNER)).then((r) => r.json())]);
+  // The log holds every owner's events; this page shows only Anna's.
+  const events = all.filter((e) => e.owner === OWNER);
   document.getElementById('chain').textContent = chain.ok
-    ? `${chain.records} entries. None has been changed or removed since it was written.`
+    ? `${events.length} entries. None has been changed or removed since it was written.`
     : `Warning: entry ${chain.brokenAt} has been changed or removed after it was written.`;
   const r = document.getElementById('refused');
   r.hidden = refused.length === 0;
