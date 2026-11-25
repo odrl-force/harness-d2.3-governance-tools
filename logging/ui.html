@@ -92,13 +92,13 @@ function sentence(e) {
 }
 
 async function load() {
-  const [all, chain, refused] = await Promise.all([fetch('/events').then((r) => r.json()), fetch('/verify').then((r) => r.json()),
-    fetch('/rejected?owner=' + encodeURIComponent(OWNER)).then((r) => r.json())]);
-  // The log holds every owner's events; this page shows only Anna's.
-  const events = all.filter((e) => e.owner === OWNER);
+  // The log holds every owner's events; the server returns only Anna's.
+  const [events, chain, refused] = await Promise.all([fetch('/events?owner=' + encodeURIComponent(OWNER)).then((r) => r.json()),
+    fetch('/verify').then((r) => r.json()), fetch('/rejected?owner=' + encodeURIComponent(OWNER)).then((r) => r.json())]);
+  // The chain runs through every owner's records, so a break is reported by its place in the whole log.
   document.getElementById('chain').textContent = chain.ok
     ? `${events.length} entries. None has been changed or removed since it was written.`
-    : `Warning: entry ${chain.brokenAt} has been changed or removed after it was written.`;
+    : `Warning: record ${chain.brokenAt} of the shared log has been changed or removed after it was written. Entries from that point on cannot be trusted.`;
   const r = document.getElementById('refused');
   r.hidden = refused.length === 0;
   r.textContent = `${refused.length} ${refused.length === 1 ? 'entry naming you was' : 'entries naming you were'} refused because they were malformed. They are kept apart and not shown here.`;
