@@ -102,9 +102,10 @@ Utility data in a smart city. Anna's monthly electricity readings sit in her pod
 - **Flow 2, sharing at the user's request (Data Act Art. 5).** EnerCo, a made-up
   energy-advice company, reads them to advise her on her energy use.
 - **Refusal.** Nobody may read them for marketing or advertising.
-- **AI service (listed only).** EnerCo offers a household electricity forecast. Anyone may
-  use it for advice on their energy use. Nobody may use it for credit checking, a high-risk
-  use under the AI Act.
+- **AI service.** EnerCo forecasts a household's electricity use from its readings and
+  keeps the forecast in its own pod. Only that household may read it, for advice on its
+  energy use. Nobody may use the service or a forecast for credit checking, a high-risk use
+  under the AI Act. Bob's rules refuse EnerCo, so he gets no forecast.
 - **A second household.** Bob keeps his readings in his own pod. His rules let anyone read
   them for scientific research, until a set date.
 - **A research study.** It reads both offers, then asks for both households' readings for

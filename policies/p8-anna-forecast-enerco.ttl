@@ -1,0 +1,37 @@
+# D2.3 policy P8: Anna's agreement with EnerCo's forecast service.
+# Anna may read the forecast EnerCo made of her household, for advice on her own energy
+# use. Nobody else may: the forecast is personal data about her household.
+#
+# Requirements: AI1 roles (a household reading its own forecast is not a deployer),
+#               AI3 intended purpose.
+
+@prefix odrl: <http://www.w3.org/ns/odrl/2/> .
+@prefix dpv:  <https://w3id.org/dpv#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix d23:  <http://example.org/d23/> .
+@prefix req:  <http://example.org/d23/requirement/> .
+
+# Policy: EnerCo and Anna (an Agreement made from the offer in P4)
+d23:policy-p8-anna-forecast-enerco
+    a                   odrl:Agreement ;
+    odrl:uid            d23:policy-p8-anna-forecast-enerco ;
+    dct:title           "Anna may read EnerCo's forecast of her household for advice on her energy use"@en ;
+    dct:references      <http://data.europa.eu/eli/reg/2024/1689/oj> ;   # AI Act
+    dct:requires        req:AI1 , req:AI3 ;
+    prov:wasDerivedFrom d23:policy-p4-ai-service-enerco ;
+    odrl:permission     d23:p8-permission .
+
+d23:p8-permission
+    a               odrl:Permission ;
+    odrl:action     odrl:read ;
+    odrl:target     <http://localhost:3000/enerco/services/forecast/anna> ;
+    odrl:assigner   <http://localhost:3000/enerco/profile/card#me> ;
+    odrl:assignee   <http://localhost:3000/anna/profile/card#me> ;
+    odrl:constraint d23:p8-purpose .
+
+d23:p8-purpose
+    a                 odrl:Constraint ;
+    odrl:leftOperand  odrl:purpose ;
+    odrl:operator     odrl:eq ;
+    odrl:rightOperand dpv:OptimisationForConsumer .

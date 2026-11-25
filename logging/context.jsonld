@@ -28,6 +28,7 @@
     "decision": { "@id": "d23:decision" },
     "rules": { "@id": "d23:decidingRule", "@type": "@id", "@container": "@set" },
     "correlation": { "@id": "d23:correlation" },
+    "informedBy": { "@id": "d23:informedBy" },
     "seq": { "@id": "d23:sequenceNumber", "@type": "xsd:integer" },
     "recordedAt": { "@id": "d23:recordedAt", "@type": "xsd:dateTime" },
     "httpStatus": { "@id": "d23:httpStatus", "@type": "xsd:integer" },

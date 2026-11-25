@@ -92,10 +92,10 @@ BE: on D2, under 'What must be documented', should be:
 | DA1 (IoT access)             | TBD                  | TBD                                                          | TBD                                                    |
 | DA2 (User-initiated sharing) | Yes                  | Policy authorship (LOAMA)                                    | None known                                             |
 | DA3 (Use restrictions)       | Yes                  | Prohibition rules; prohibition-overrides-permission strategy | None known                                             |
-| AI1 (Roles)                  | Partly               | `dct:publisher` in catalogue; `requester`, `owner` in log    | Provider property missing; forecasts not per household |
-| AI2 (AI system)              | Partly               | `ai:AISystem` in catalogue                                   | Forecast method not built                              |
-| AI3 (Intended purpose)       | Partly               | Purpose constraint in EnerCo's service policy                | Service not running, so not enforced                   |
-| AI4 (Credit-checking ban)    | Partly               | Prohibition in EnerCo's service policy                       | Needs its own policy (see #42)                         |
-| AI5 (Logging)                | Partly               | Hash-chained log                                             | Service calls not logged yet                           |
-| AI6 (AI disclosure)          | Partly               | `ai:AISystem` in catalogue                                   | Responses do not say an AI system made them            |
+| AI1 (Roles)                  | Yes                  | `tech:hasProvider` in catalogue; `requester`, `owner` in log | Only Anna has a forecast so far                        |
+| AI2 (AI system)              | Yes                  | `ai:AISystem`, `ai:hasTechnique` in catalogue                | None known                                             |
+| AI3 (Intended purpose)       | Yes                  | Purpose constraint in Anna's forecast agreement              | None known                                             |
+| AI4 (Credit-checking ban)    | Yes                  | Prohibition in its own policy, `odrl:isAnyOf`                | Each new forecast must be added to the ban             |
+| AI5 (Logging)                | Yes                  | Hash-chained log; `informedBy` links forecast and input      | Records access, not the model's internal steps         |
+| AI6 (AI disclosure)          | Yes                  | Catalogue type `ai:AISystem`; forecast `prov:wasGeneratedBy` | None known                                             |
 | AI7 (AI literacy)            | No                   | None                                                         | Organisational duty, nothing to build                  |

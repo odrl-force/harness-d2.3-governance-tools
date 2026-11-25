@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { parseTurtle, replay, type Replay } from './replay.mts';
+import { readMonths, forecastTurtle } from './forecast.mts';
 
 const root = fileURLToPath(new URL('../', import.meta.url)); // fileURLToPath also works on Windows
 const CSS = 'http://localhost:3000';
@@ -11,6 +12,8 @@ const LOG = 'http://localhost:5100';
 const RESOURCE = `${CSS}/anna/energy/meter-readings`;
 const ODRL = 'http://www.w3.org/ns/odrl/2/';
 const DPV = 'https://w3id.org/dpv#';
+const FINANCE = 'https://w3id.org/dpv/sector/finance#';
+const SERVICE = `${CSS}/enerco/services/forecast`;
 const WEBID_CLAIM = 'urn:solidlab:uma:claims:types:webid';
 const PURPOSE_CLAIM = ODRL + 'purpose';
 const webid = (pod: string) => `${CSS}/${pod}/profile/card#me`;
@@ -18,18 +21,25 @@ const ANNA = webid('anna');
 const CITY = webid('ghent');
 const ENERCO = webid('enerco');
 const STUDY = webid('study');
+const BOB = webid('bob');
 
-// A household: whose pod, which resource, which demo file, and the policies the owner posts.
-type Household = { name: string; possessive: string; webid: string; resource: string; data: string; ownerRule: string; policies: string[] };
+// A household: whose pod, which resource, which demo file and the policies the owner posts.
+type Household = { name: string; possessive: string; webid: string; resource: string; data?: string; ownerRule: string; policies: string[] };
 const ANNA_HOME: Household = {
   name: 'Anna', possessive: 'her', webid: ANNA, resource: RESOURCE, data: 'demo/meter-readings.ttl', ownerRule: 'P0',
   policies: ['policies/p0-anna-owner.ttl', 'policies/p1-altruism-city.ttl', 'policies/p2-commercial-enerco.ttl', 'policies/p3-no-marketing.ttl'],
 };
 const BOB_HOME: Household = {
-  name: 'Bob', possessive: 'his', webid: webid('bob'), resource: `${CSS}/bob/energy/meter-readings`, data: 'demo/bob-meter-readings.ttl', ownerRule: 'P5',
+  name: 'Bob', possessive: 'his', webid: BOB, resource: `${CSS}/bob/energy/meter-readings`, data: 'demo/bob-meter-readings.ttl', ownerRule: 'P5',
   policies: ['policies/p5-bob-owner.ttl', 'policies/p6-bob-research.ttl'],
 };
-type Request = { method?: string; body?: string; requester: string; purposes?: string[]; home?: Household };
+// EnerCo's pod holds the forecast of Anna's household. P4, the offer, is for the catalogue only.
+const ENERCO_HOME: Household = {
+  name: 'EnerCo', possessive: 'its', webid: ENERCO, resource: `${SERVICE}/anna`, ownerRule: 'P7',
+  policies: ['policies/p7-enerco-owner.ttl', 'policies/p4b-no-credit-checking-enerco.ttl', 'policies/p8-anna-forecast-enerco.ttl'],
+};
+// informedBy: the correlation of an earlier attempt this one builds on.
+type Request = { method?: string; body?: string; requester: string; purposes?: string[]; home?: Household; informedBy?: string };
 
 type Attempt = {
   firstStatus: number;
@@ -43,7 +53,7 @@ type Attempt = {
 
 const read = (file: string) => fs.readFileSync(root + file, 'utf8');
 const sha = (text: string) => 'sha256:' + crypto.createHash('sha256').update(text).digest('hex');
-const short = (iri = '') => iri.replace(DPV, 'dpv:').replace(ODRL, 'odrl:').replace('http://example.org/d23/', 'd23:');
+const short = (iri = '') => iri.replace(DPV, 'dpv:').replace(FINANCE, 'sector-finance:').replace(ODRL, 'odrl:').replace('http://example.org/d23/', 'd23:');
 const pause = (ms: number) => new Promise((ok) => setTimeout(ok, ms));
 const failures: string[] = [];
 const expect = (label: string, ok: boolean) => { if (!ok) failures.push(label); };
@@ -108,7 +118,8 @@ async function attempt(label: string, c: Request): Promise<Attempt> {
   const h = c.home ?? ANNA_HOME;
   const r = await access(c);
   const action = ODRL + (c.method === 'PUT' ? 'write' : 'read');
-  const base = { owner: h.webid, resource: h.resource, correlation: r.ticket ?? 'no-ticket-' + crypto.randomUUID(), requester: c.requester, action };
+  const base = { owner: h.webid, resource: h.resource, correlation: r.ticket ?? 'no-ticket-' + crypto.randomUUID(), requester: c.requester, action,
+    ...(c.informedBy ? { informedBy: c.informedBy } : {}) };
   const purposes = c.purposes ?? [];
   await log({ ...base, type: 'AccessRequested', purposes, claimTypes: purposes.length ? ['webid', 'purpose'] : ['webid'], httpStatus: r.firstStatus, note: label });
   if (r.tokenStatus !== undefined) {
@@ -142,8 +153,7 @@ const explain = (r: Attempt) => {
 };
 const rules = (r: Attempt) => r.replay?.active.map((a) => short(a.rule)).join(', ') || 'none';
 
-async function setUp(step: number, h: Household) {
-  console.log(`${step}. ${h.name} sets up`);
+async function postPolicies(h: Household) {
   for (const f of h.policies) {
     const status = await postPolicy(f, h);
     console.log(`   posts ${f}: ${status}`);
@@ -151,7 +161,12 @@ async function setUp(step: number, h: Household) {
     if (status === 409) { console.log('   UMA already holds this policy. Restart the stack for a clean run.'); process.exit(1); }
     expect(`posting ${f} gives 201`, status === 201);
   }
-  const put = await attempt(`${h.name} stores ${h.possessive} meter readings`, { method: 'PUT', body: read(h.data), requester: h.webid, home: h });
+}
+
+async function setUp(step: number, h: Household) {
+  console.log(`${step}. ${h.name} sets up`);
+  await postPolicies(h);
+  const put = await attempt(`${h.name} stores ${h.possessive} meter readings`, { method: 'PUT', body: read(h.data ?? ''), requester: h.webid, home: h });
   console.log(`   stores ${h.data}: ${explain(put)}`);
   expect(`${h.name} stores ${h.possessive} readings`, allowed(put));
 }
@@ -189,7 +204,47 @@ const ads = await attempt('EnerCo asks for personalised advertising', { requeste
 console.log(`   with dpv:PersonalisedAdvertising: ${explain(ads)}; rules: ${rules(ads)}`);
 expect('EnerCo with dpv:PersonalisedAdvertising is refused', !allowed(ads));
 
-console.log('6. A research study asks Anna and Bob');
+console.log("6. EnerCo's forecast service");
+console.log(`   the offer accepts: ${offeredFor(SERVICE).join(', ')}`);
+expect("the forecast offer accepts dpv:OptimisationForConsumer", offeredFor(SERVICE).includes('dpv:OptimisationForConsumer'));
+await postPolicies(ENERCO_HOME);
+// The forecast is computed from the readings EnerCo read in step 5, under Anna's P2.
+const forecast = advice.finalBody ? forecastTurtle(readMonths(advice.finalBody), SERVICE, RESOURCE) : '';
+const write = await attempt("EnerCo writes Anna's forecast", { method: 'PUT', body: forecast, requester: ENERCO, home: ENERCO_HOME, informedBy: advice.ticket });
+console.log(`   writes Anna's forecast from the readings of step 5: ${explain(write)}`);
+expect("EnerCo writes Anna's forecast", allowed(write));
+const forecastFor = (label: string, requester: string, purposes: string[]) =>
+  attempt(label, { requester, purposes, home: ENERCO_HOME, ...(requester === ANNA ? { informedBy: advice.ticket } : {}) });
+const own = await forecastFor('Anna reads her forecast for advice', ANNA, [DPV + 'OptimisationForConsumer']);
+console.log(`   Anna, with dpv:OptimisationForConsumer: ${explain(own)}; rules: ${rules(own)}`);
+expect('Anna reads her forecast', allowed(own));
+expect('the forecast says an AI system made it', (own.finalBody ?? '').includes(`<${SERVICE}>`));
+const credit = await forecastFor('Anna asks her forecast for credit checking', ANNA, [FINANCE + 'CreditChecking']);
+console.log(`   Anna, with sector-finance:CreditChecking: ${explain(credit)}; rules: ${rules(credit)}`);
+expect('credit checking is refused', !allowed(credit));
+const mixed = await forecastFor('Anna asks her forecast for advice and a credit score', ANNA, [DPV + 'OptimisationForConsumer', FINANCE + 'CreditScoreEvaluation']);
+console.log(`   Anna, with dpv:OptimisationForConsumer and sector-finance:CreditScoreEvaluation: ${explain(mixed)}; rules: ${rules(mixed)}`);
+expect('advice mixed with a credit score is refused', !allowed(mixed));
+const narrower = ['CreditHistoryEvaluation', 'CreditLimitDetermination', 'CreditScoreEvaluation', 'InstabilityRiskAssessment',
+  'MaintainCreditCheckingDatabase', 'MaintainCreditRatingDatabase'];
+let refused = 0;
+for (const term of narrower) {
+  const r = await forecastFor(`Anna asks her forecast for ${term}`, ANNA, [FINANCE + term]);
+  if (!allowed(r)) refused++;
+  expect(`sector-finance:${term} is refused`, !allowed(r));
+}
+console.log(`   Anna, with each of the ${narrower.length} narrower credit terms alone: ${refused} refused`);
+// Advice mixed with an allowed-elsewhere purpose: UMA grants it, as for any mixed request (#42).
+const harmless = await forecastFor('Anna asks her forecast for advice and research', ANNA, [DPV + 'OptimisationForConsumer', DPV + 'ScientificResearch']);
+console.log(`   Anna, with dpv:OptimisationForConsumer and dpv:ScientificResearch: ${explain(harmless)}; rules: ${rules(harmless)}`);
+const bobsReadings = await attempt("EnerCo asks to advise Bob", { requester: ENERCO, purposes: [DPV + 'OptimisationForConsumer'], home: BOB_HOME });
+console.log(`   EnerCo reads Bob's readings for advice: ${explain(bobsReadings)}, so no forecast for Bob`);
+expect("Bob's rules refuse EnerCo", !allowed(bobsReadings));
+const other = await forecastFor("Bob asks for Anna's forecast", BOB, [DPV + 'OptimisationForConsumer']);
+console.log(`   Bob, Anna's forecast: ${explain(other)}; rules: ${rules(other)}`);
+expect("Bob is refused Anna's forecast", !allowed(other));
+
+console.log('7. A research study asks Anna and Bob');
 const research = 'dpv:ScientificResearch';
 const accepts = (resource: string) => (offeredFor(resource).includes(research) ? 'yes' : 'no');
 console.log(`   offers accepting ${research}: Anna's ${accepts(RESOURCE)}, Bob's ${accepts(BOB_HOME.resource)}`);
@@ -205,7 +260,7 @@ expect('the study reads Bob\'s readings', allowed(studyBob));
 
 await pause(200);
 const chain = await (await fetch(`${LOG}/verify`)).json() as { ok: boolean; records?: number; brokenAt?: number };
-console.log(`7. The log: ${chain.records ?? '?'} records, chain ${chain.ok ? 'intact' : 'broken at ' + chain.brokenAt}. Anna's page: ${LOG}/`);
+console.log(`8. The log: ${chain.records ?? '?'} records, chain ${chain.ok ? 'intact' : 'broken at ' + chain.brokenAt}. Anna's page: ${LOG}/`);
 expect('the log chain verifies', chain.ok);
 
 console.log(failures.length ? `FAILED:\n - ${failures.join('\n - ')}` : 'All expected outcomes met.');
