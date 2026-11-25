@@ -34,6 +34,6 @@ Required in every event: `type`, `time`, `source`, `correlation`, `resource`, `o
 | PROV-O terms in `context.jsonld`                                      | `prov:atTime`, `prov:used`, `prov:wasAssociatedWith`: so audit queries can be shared.                                                     |
 | Append-only file with a hash chain                                    | Each record holds the hash of the one before. Changing or deleting an old record breaks the chain, and `/verify` reports where.            |
 | `source: "run-script"`                                                | CSS/the pod does not post events. The demo script writes them on its behalf.                                                              |   
-
+| `informedBy`                                                          | Links an attempt to the earlier one it builds on: Anna's read of her forecast to EnerCo's read of her readings (`d23:informedBy`).        |
 
 

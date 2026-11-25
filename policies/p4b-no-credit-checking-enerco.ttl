@@ -1,0 +1,56 @@
+# D2.3 policy P4b: EnerCo's ban on credit checking.
+# Nobody may use EnerCo's forecast service, or read a forecast it made, for credit checking,
+# a high-risk use under the AI Act (Annex III, point 5(b)). Kept apart from the permissions:
+# in the same policy, UMA refuses every mixed-purpose request; with no prohibition, it
+# grants mixed requests that include credit checking (issue #42).
+#
+# Requirements: AI4 credit-checking ban (AI Act Art. 25.1(c), 25.2), AI5 logging.
+#
+# Targets are exact resources: UMA does not apply a rule on a container to what it holds.
+# Each new forecast needs adding here.
+
+@prefix odrl:           <http://www.w3.org/ns/odrl/2/> .
+@prefix sector-finance: <https://w3id.org/dpv/sector/finance#> .
+@prefix dct:            <http://purl.org/dc/terms/> .
+@prefix d23:            <http://example.org/d23/> .
+@prefix req:            <http://example.org/d23/requirement/> .
+
+# Policy: the ban (a Set: it applies to everyone, so no assignee)
+d23:policy-p4b-no-credit-checking
+    a                odrl:Set ;
+    odrl:uid         d23:policy-p4b-no-credit-checking ;
+    dct:title        "Nobody may use EnerCo's forecast service or its forecasts for credit checking"@en ;
+    dct:references   <http://data.europa.eu/eli/reg/2024/1689/oj> ;   # AI Act
+    dct:requires     req:AI4 , req:AI5 ;
+    odrl:permission  d23:p4b-anchor ;
+    odrl:prohibition d23:p4b-no-credit-checking .
+
+# Permission: EnerCo may read Anna's forecast (UMA refuses a policy with prohibitions only)
+d23:p4b-anchor
+    a             odrl:Permission ;
+    odrl:action   odrl:read ;
+    odrl:target   <http://localhost:3000/enerco/services/forecast/anna> ;
+    odrl:assigner <http://localhost:3000/enerco/profile/card#me> ;
+    odrl:assignee <http://localhost:3000/enerco/profile/card#me> .
+
+# Prohibition: nobody may read for credit checking or any narrower purpose
+d23:p4b-no-credit-checking
+    a               odrl:Prohibition ;
+    odrl:action     odrl:read ;
+    odrl:target     <http://localhost:3000/enerco/services/forecast> ,
+                    <http://localhost:3000/enerco/services/forecast/anna> ;
+    odrl:assigner   <http://localhost:3000/enerco/profile/card#me> ;
+    odrl:constraint d23:p4b-c-credit-checking .
+
+# isAnyOf lists every term: UMA does not load DPV, so odrl:isA would not see the hierarchy
+d23:p4b-c-credit-checking
+    a                 odrl:Constraint ;
+    odrl:leftOperand  odrl:purpose ;
+    odrl:operator     odrl:isAnyOf ;
+    odrl:rightOperand sector-finance:CreditChecking ,
+                      sector-finance:CreditHistoryEvaluation ,
+                      sector-finance:CreditLimitDetermination ,
+                      sector-finance:CreditScoreEvaluation ,
+                      sector-finance:InstabilityRiskAssessment ,
+                      sector-finance:MaintainCreditCheckingDatabase ,
+                      sector-finance:MaintainCreditRatingDatabase .

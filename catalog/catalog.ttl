@@ -1,8 +1,11 @@
-@prefix dcat: <http://www.w3.org/ns/dcat#> .
-@prefix dct:  <http://purl.org/dc/terms/> .
-@prefix odrl: <http://www.w3.org/ns/odrl/2/> .
-@prefix ai:   <https://w3id.org/dpv/ai#> .
-@prefix d23:  <http://example.org/d23/> .
+@prefix dcat:     <http://www.w3.org/ns/dcat#> .
+@prefix dct:      <http://purl.org/dc/terms/> .
+@prefix odrl:     <http://www.w3.org/ns/odrl/2/> .
+@prefix ai:       <https://w3id.org/dpv/ai#> .
+@prefix tech:     <https://w3id.org/dpv/tech#> .
+@prefix dpv:      <https://w3id.org/dpv#> .
+@prefix eu-aiact: <https://w3id.org/dpv/legal/eu/aiact#> .
+@prefix d23:      <http://example.org/d23/> .
 
 # The server adds an ODRL offer to each dataset and data service from the rules in
 # policies/*.ttl.
@@ -41,10 +44,21 @@ d23:bob-meter-readings-turtle
     dcat:accessURL <http://localhost:3000/bob/energy/meter-readings> ;
     dcat:mediaType <http://www.iana.org/assignments/media-types/text/turtle> .
 
-# Data service: EnerCo's AI forecast. Listed only; nothing answers at its address yet.
+# Data service: EnerCo's AI forecast. Each household reads its own forecast in the
+# endpoint container, for example .../forecast/anna.
 <http://localhost:3000/enerco/services/forecast>
-    a                dcat:DataService , ai:AISystem , odrl:Asset ;
-    dct:title        "EnerCo's household electricity forecast"@en ;
-    dct:description  "AI service that forecasts a household's electricity use for the next twelve months from its monthly readings"@en ;
-    dct:publisher    <http://localhost:3000/enerco/profile/card#me> ;
-    dcat:endpointURL <http://localhost:3000/enerco/services/forecast> .
+    a                     dcat:DataService , ai:AISystem , odrl:Asset ;
+    dct:title             "EnerCo's household electricity forecast"@en ;
+    dct:description       "AI service that forecasts a household's electricity use for the next twelve months from its twelve monthly readings. The method, a least-squares fit of mean level plus one yearly sine and cosine, stands in for an AI system"@en ;
+    dct:publisher         <http://localhost:3000/enerco/profile/card#me> ;
+    tech:hasProvider      <http://localhost:3000/enerco/profile/card#me> ;
+    ai:hasTechnique       ai:StatisticalTechnique ;
+    tech:hasIntendedUse   d23:forecast-intended-purpose ;
+    eu-aiact:hasRiskLevel eu-aiact:RiskLevelTransparencyRequired ;
+    dcat:endpointURL      <http://localhost:3000/enerco/services/forecast/> .
+
+# Intended purpose (AI Act Art. 3.12): advice on the household's own energy use
+d23:forecast-intended-purpose
+    a               eu-aiact:IntendedPurpose ;
+    dct:description "Advice on a household's own energy use"@en ;
+    dpv:hasPurpose  dpv:OptimisationForConsumer .

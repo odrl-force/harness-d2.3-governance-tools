@@ -34,4 +34,5 @@ Options:
 - The offer names each assignee, so anyone who reads the catalogue sees who Anna shares
   with. Showing each participant only its own offers needs the catalogue to know who asks
   (#15).
-- EnerCo's forecast service is listed only: nothing answers at its address yet.
+- Each household reads its forecast in the service's endpoint container, for example
+  `.../forecast/anna`.
