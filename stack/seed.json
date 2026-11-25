@@ -3,5 +3,6 @@
   { "email": "ghent@example.org",  "password": "d23-demo-only", "pods": [{ "name": "ghent" }],  "authz": { "server": "http://localhost:4000/uma" } },
   { "email": "enerco@example.org", "password": "d23-demo-only", "pods": [{ "name": "enerco" }], "authz": { "server": "http://localhost:4000/uma" } },
   { "email": "other@example.org",  "password": "d23-demo-only", "pods": [{ "name": "other" }],  "authz": { "server": "http://localhost:4000/uma" } },
-  { "email": "bob@example.org",    "password": "d23-demo-only", "pods": [{ "name": "bob" }],    "authz": { "server": "http://localhost:4000/uma" } }
+  { "email": "bob@example.org",    "password": "d23-demo-only", "pods": [{ "name": "bob" }],    "authz": { "server": "http://localhost:4000/uma" } },
+  { "email": "study@example.org",  "password": "d23-demo-only", "pods": [{ "name": "study" }],  "authz": { "server": "http://localhost:4000/uma" } }
 ]

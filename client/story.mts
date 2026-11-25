@@ -17,6 +17,7 @@ const webid = (pod: string) => `${CSS}/${pod}/profile/card#me`;
 const ANNA = webid('anna');
 const CITY = webid('ghent');
 const ENERCO = webid('enerco');
+const STUDY = webid('study');
 
 // A household: whose pod, which resource, which demo file, and the policies the owner posts.
 type Household = { name: string; possessive: string; webid: string; resource: string; data: string; ownerRule: string; policies: string[] };
@@ -160,12 +161,15 @@ await setUp(2, BOB_HOME);
 
 console.log('3. The City finds the data');
 const catalog = parseTurtle(await (await fetch(CATALOG)).text());
-// Only the offer on Anna's dataset: other listings have offers of their own.
-const offer = catalog.find((q) => q.subject.value === RESOURCE && q.predicate.value === ODRL + 'hasPolicy')?.object.value;
-const permitted = new Set(catalog.filter((q) => q.subject.value === offer && q.predicate.value === ODRL + 'permission').map((q) => q.object.value));
 const valueOf = new Map(catalog.filter((q) => q.predicate.value === ODRL + 'rightOperand').map((q) => [q.subject.value, q.object.value]));
 const ruleOf = new Map(catalog.filter((q) => q.predicate.value === ODRL + 'constraint').map((q) => [q.object.value, q.subject.value]));
-const offered = [...valueOf].filter(([c, v]) => v.startsWith(DPV) && permitted.has(ruleOf.get(c) ?? '')).map(([, v]) => short(v));
+// The purposes the offer on one listing accepts: each listing has an offer of its own.
+function offeredFor(resource: string): string[] {
+  const offer = catalog.find((q) => q.subject.value === resource && q.predicate.value === ODRL + 'hasPolicy')?.object.value;
+  const permitted = new Set(catalog.filter((q) => q.subject.value === offer && q.predicate.value === ODRL + 'permission').map((q) => q.object.value));
+  return [...valueOf].filter(([c, v]) => v.startsWith(DPV) && permitted.has(ruleOf.get(c) ?? '')).map(([, v]) => short(v));
+}
+const offered = offeredFor(RESOURCE);
 console.log(`   the offer accepts: ${offered.join(', ')}`);
 expect('the catalogue offers dpv:ImprovePublicServices', offered.includes('dpv:ImprovePublicServices'));
 
@@ -185,9 +189,23 @@ const ads = await attempt('EnerCo asks for personalised advertising', { requeste
 console.log(`   with dpv:PersonalisedAdvertising: ${explain(ads)}; rules: ${rules(ads)}`);
 expect('EnerCo with dpv:PersonalisedAdvertising is refused', !allowed(ads));
 
+console.log('6. A research study asks Anna and Bob');
+const research = 'dpv:ScientificResearch';
+const accepts = (resource: string) => (offeredFor(resource).includes(research) ? 'yes' : 'no');
+console.log(`   offers accepting ${research}: Anna's ${accepts(RESOURCE)}, Bob's ${accepts(BOB_HOME.resource)}`);
+expect("Anna's offer leaves research out", accepts(RESOURCE) === 'no');
+expect("Bob's offer accepts research", accepts(BOB_HOME.resource) === 'yes');
+// The offer only informs: the study asks both, and UMA decides.
+const studyAnna = await attempt('Research study asks Anna for scientific research', { requester: STUDY, purposes: [DPV + 'ScientificResearch'] });
+console.log(`   Anna, with ${research}: ${explain(studyAnna)}; rules: ${rules(studyAnna)}`);
+expect('the study is refused Anna\'s readings', !allowed(studyAnna));
+const studyBob = await attempt('Research study asks Bob for scientific research', { requester: STUDY, purposes: [DPV + 'ScientificResearch'], home: BOB_HOME });
+console.log(`   Bob, with ${research}: ${explain(studyBob)}; rules: ${rules(studyBob)}`);
+expect('the study reads Bob\'s readings', allowed(studyBob));
+
 await pause(200);
 const chain = await (await fetch(`${LOG}/verify`)).json() as { ok: boolean; records?: number; brokenAt?: number };
-console.log(`6. The log: ${chain.records ?? '?'} records, chain ${chain.ok ? 'intact' : 'broken at ' + chain.brokenAt}. Anna's page: ${LOG}/`);
+console.log(`7. The log: ${chain.records ?? '?'} records, chain ${chain.ok ? 'intact' : 'broken at ' + chain.brokenAt}. Anna's page: ${LOG}/`);
 expect('the log chain verifies', chain.ok);
 
 console.log(failures.length ? `FAILED:\n - ${failures.join('\n - ')}` : 'All expected outcomes met.');
