@@ -99,6 +99,9 @@ Utility data in a smart city. Anna's monthly electricity readings sit in her pod
   organisation is under discussion.
 - **Flow 2, sharing at the user's request (Data Act Art. 5).** EnerCo, a made-up
   energy-advice company, reads them to advise her on her energy use.
+- **AI service (listed only).** EnerCo offers a household electricity forecast. Anyone may
+  use it for advice on their energy use. Nobody may use it for credit checking, a high-risk
+  use under the AI Act.
 - **Refusal.** Nobody may read them for marketing or advertising.
 
 ## Related work

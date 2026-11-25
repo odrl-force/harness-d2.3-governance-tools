@@ -1,15 +1,18 @@
 @prefix dcat: <http://www.w3.org/ns/dcat#> .
 @prefix dct:  <http://purl.org/dc/terms/> .
 @prefix odrl: <http://www.w3.org/ns/odrl/2/> .
+@prefix ai:   <https://w3id.org/dpv/ai#> .
 @prefix d23:  <http://example.org/d23/> .
 
-# The server adds an ODRL offer to each dataset from the rules in policies/*.ttl.
+# The server adds an ODRL offer to each dataset and data service from the rules in
+# policies/*.ttl.
 
 # Catalogue
 d23:catalog
     a            dcat:Catalog ;
     dct:title    "D2.3 demo data space catalogue"@en ;
-    dcat:dataset <http://localhost:3000/anna/energy/meter-readings> .
+    dcat:dataset <http://localhost:3000/anna/energy/meter-readings> ;
+    dcat:service <http://localhost:3000/enerco/services/forecast> .
 
 # Dataset: the resource in Anna's pod
 <http://localhost:3000/anna/energy/meter-readings>
@@ -23,3 +26,11 @@ d23:meter-readings-turtle
     a              dcat:Distribution ;
     dcat:accessURL <http://localhost:3000/anna/energy/meter-readings> ;
     dcat:mediaType <http://www.iana.org/assignments/media-types/text/turtle> .
+
+# Data service: EnerCo's AI forecast. Listed only; nothing answers at its address yet.
+<http://localhost:3000/enerco/services/forecast>
+    a                dcat:DataService , ai:AISystem , odrl:Asset ;
+    dct:title        "EnerCo's household electricity forecast"@en ;
+    dct:description  "AI service that forecasts a household's electricity use for the next twelve months from its monthly readings"@en ;
+    dct:publisher    <http://localhost:3000/enerco/profile/card#me> ;
+    dcat:endpointURL <http://localhost:3000/enerco/services/forecast> .

@@ -1,0 +1,50 @@
+# D2.3 policy P4: EnerCo's AI forecast service.
+# Any participant may call the service for advice on its own energy use. Nobody may call
+# it for credit checking, a high-risk use under the AI Act (Annex III, point 5(b)).
+#
+# Listed in the catalogue only: no server answers at the service's address yet, so the
+# run script does not post this policy to UMA.
+
+@prefix odrl:           <http://www.w3.org/ns/odrl/2/> .
+@prefix dpv:            <https://w3id.org/dpv#> .
+@prefix sector-finance: <https://w3id.org/dpv/sector/finance#> .
+@prefix dct:            <http://purl.org/dc/terms/> .
+@prefix d23:            <http://example.org/d23/> .
+
+# Policy: EnerCo's offer to any participant (an Offer: no assignee, nothing agreed yet)
+d23:policy-p4-ai-service-enerco
+    a                odrl:Offer ;
+    odrl:uid         d23:policy-p4-ai-service-enerco ;
+    dct:title        "EnerCo's forecast service may be used for advice on energy use, never for credit checking"@en ;
+    dct:references   <http://data.europa.eu/eli/reg/2024/1689/oj> ;   # AI Act
+    odrl:permission  d23:p4-permission ;
+    odrl:prohibition d23:p4-no-credit-checking .
+
+# Permission: anyone may call the service (odrl:read: a call is a GET on its address)
+d23:p4-permission
+    a               odrl:Permission ;
+    odrl:action     odrl:read ;
+    odrl:target     <http://localhost:3000/enerco/services/forecast> ;
+    odrl:assigner   <http://localhost:3000/enerco/profile/card#me> ;
+    odrl:constraint d23:p4-purpose .
+
+# Condition: the stated purpose must be "optimisation for the consumer" (advice)
+d23:p4-purpose
+    a                 odrl:Constraint ;
+    odrl:leftOperand  odrl:purpose ;
+    odrl:operator     odrl:eq ;
+    odrl:rightOperand dpv:OptimisationForConsumer .
+
+# Prohibition: nobody may call the service for credit checking
+d23:p4-no-credit-checking
+    a               odrl:Prohibition ;
+    odrl:action     odrl:read ;
+    odrl:target     <http://localhost:3000/enerco/services/forecast> ;
+    odrl:assigner   <http://localhost:3000/enerco/profile/card#me> ;
+    odrl:constraint d23:p4-c-credit-checking .
+
+d23:p4-c-credit-checking
+    a                 odrl:Constraint ;
+    odrl:leftOperand  odrl:purpose ;
+    odrl:operator     odrl:eq ;
+    odrl:rightOperand sector-finance:CreditChecking .

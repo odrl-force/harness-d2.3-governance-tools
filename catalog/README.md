@@ -1,8 +1,9 @@
 # Catalogue
 
-The data space's catalogue: lists Anna's meter readings as a DCAT dataset with an ODRL
-offer, so a participant can find the data. The server builds each offer from the rules in
-`policies/` on every request. The offer only informs.
+The data space's catalogue: lists Anna's meter readings as a DCAT dataset and EnerCo's AI
+forecast as a DCAT data service, each with an ODRL offer, so a participant can find them.
+The server builds each offer from the rules in `policies/` on every request. The offers only
+inform.
 
 ## Run it
 
@@ -33,3 +34,4 @@ Options:
 - The offer names each assignee, so anyone who reads the catalogue sees who Anna shares
   with. Showing each participant only its own offers needs the catalogue to know who asks
   (#15).
+- EnerCo's forecast service is listed only: nothing answers at its address yet.
