@@ -105,6 +105,9 @@ Utility data in a smart city. Anna's monthly electricity readings sit in her pod
 - **Refusal.** Nobody may read them for marketing or advertising.
 - **A second household.** Bob keeps his readings in his own pod. His rules let anyone read
   them for scientific research, until a set date.
+  - **A research study.** It reads both offers, then asks for both households' readings for
+  scientific research. Anna's rules refuse it and Bob's allow it: the catalogue informs and
+  the authorisation server decides.
 
 ## Related work
 
