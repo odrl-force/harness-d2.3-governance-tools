@@ -8,8 +8,10 @@ A person (here Anna) keeps her smart-meter readings in her Solid pod and writes 
 
 1. Discovery: The participant finds Anna's dataset in the data space's catalogue which lists the purposes she accepts.
 2. Request: The participant asks the pod and is sent to Anna's authorisation server where it states who it is and its purpose.
-3. Decision: The auth. server evaluates Anna's policies, the purpose and any existing constraints (e.g., temporal). Refusal or token granting occurs here.
+3. Decision: The authorisation server evaluates Anna's policies, the purpose and any existing constraints (e.g., temporal). Refusal or token granting occurs here.
 4. Record: each step goes to the logging server and Anna reads it on her log page.
+
+The same catalogue lists an AI service with its own rules; see [Use case](#use-case).
 
 ## Architecture
 
@@ -99,13 +101,13 @@ Utility data in a smart city. Anna's monthly electricity readings sit in her pod
   organisation is under discussion.
 - **Flow 2, sharing at the user's request (Data Act Art. 5).** EnerCo, a made-up
   energy-advice company, reads them to advise her on her energy use.
+- **Refusal.** Nobody may read them for marketing or advertising.
 - **AI service (listed only).** EnerCo offers a household electricity forecast. Anyone may
   use it for advice on their energy use. Nobody may use it for credit checking, a high-risk
   use under the AI Act.
-- **Refusal.** Nobody may read them for marketing or advertising.
 - **A second household.** Bob keeps his readings in his own pod. His rules let anyone read
   them for scientific research, until a set date.
-  - **A research study.** It reads both offers, then asks for both households' readings for
+- **A research study.** It reads both offers, then asks for both households' readings for
   scientific research. Anna's rules refuse it and Bob's allow it: the catalogue informs and
   the authorisation server decides.
 
