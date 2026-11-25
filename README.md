@@ -103,6 +103,8 @@ Utility data in a smart city. Anna's monthly electricity readings sit in her pod
   use it for advice on their energy use. Nobody may use it for credit checking, a high-risk
   use under the AI Act.
 - **Refusal.** Nobody may read them for marketing or advertising.
+- **A second household.** Bob keeps his readings in his own pod. His rules let anyone read
+  them for scientific research, until a set date.
 
 ## Related work
 

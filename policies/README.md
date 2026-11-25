@@ -6,5 +6,8 @@ builds its offers from every file here.
 P0 to P3 are Anna's rules for her meter readings. The authorisation server reads them to
 decide each request.
 
+P5 and P6 are Bob's: P5 for his own access, P6 to let anyone read his readings for
+scientific research. The authorisation server reads them too.
+
 P4 is EnerCo's offer for its AI forecast service. The catalogue lists it. No server enforces
 it yet, so the run script does not post it to UMA.

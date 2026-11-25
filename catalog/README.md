@@ -1,9 +1,9 @@
 # Catalogue
 
-The data space's catalogue: lists Anna's meter readings as a DCAT dataset and EnerCo's AI
-forecast as a DCAT data service, each with an ODRL offer, so a participant can find them.
-The server builds each offer from the rules in `policies/` on every request. The offers only
-inform.
+The data space's catalogue: lists Anna's and Bob's meter readings as DCAT datasets and
+EnerCo's AI forecast as a DCAT data service, each with an ODRL offer, so a participant can
+find them. The server builds each offer from the rules in `policies/` on every request. The
+offers only inform.
 
 ## Run it
 

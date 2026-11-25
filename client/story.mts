@@ -17,7 +17,18 @@ const webid = (pod: string) => `${CSS}/${pod}/profile/card#me`;
 const ANNA = webid('anna');
 const CITY = webid('ghent');
 const ENERCO = webid('enerco');
-const POLICIES = ['policies/p0-anna-owner.ttl', 'policies/p1-altruism-city.ttl', 'policies/p2-commercial-enerco.ttl', 'policies/p3-no-marketing.ttl'];
+
+// A household: whose pod, which resource, which demo file, and the policies the owner posts.
+type Household = { name: string; possessive: string; webid: string; resource: string; data: string; ownerRule: string; policies: string[] };
+const ANNA_HOME: Household = {
+  name: 'Anna', possessive: 'her', webid: ANNA, resource: RESOURCE, data: 'demo/meter-readings.ttl', ownerRule: 'P0',
+  policies: ['policies/p0-anna-owner.ttl', 'policies/p1-altruism-city.ttl', 'policies/p2-commercial-enerco.ttl', 'policies/p3-no-marketing.ttl'],
+};
+const BOB_HOME: Household = {
+  name: 'Bob', possessive: 'his', webid: webid('bob'), resource: `${CSS}/bob/energy/meter-readings`, data: 'demo/bob-meter-readings.ttl', ownerRule: 'P5',
+  policies: ['policies/p5-bob-owner.ttl', 'policies/p6-bob-research.ttl'],
+};
+type Request = { method?: string; body?: string; requester: string; purposes?: string[]; home?: Household };
 
 type Attempt = {
   firstStatus: number;
@@ -50,23 +61,24 @@ function policyId(file: string): string {
   return uid.object.value;
 }
 
-async function postPolicy(file: string): Promise<number> {
+async function postPolicy(file: string, h: Household): Promise<number> {
   const text = read(file);
   const r = await fetch(`${UMA}/policies`, {
     method: 'POST',
-    headers: { authorization: `WebID ${encodeURIComponent(ANNA)}`, 'content-type': 'text/turtle' },
+    headers: { authorization: `WebID ${encodeURIComponent(h.webid)}`, 'content-type': 'text/turtle' },
     body: text,
   });
-  if (r.status === 201) await log({ type: 'PolicyCreated', correlation: 'setup', policy: { id: policyId(file), hash: sha(text) }, note: file });
+  if (r.status === 201) await log({ type: 'PolicyCreated', owner: h.webid, resource: h.resource, correlation: 'setup', policy: { id: policyId(file), hash: sha(text) }, note: file });
   return r.status;
 }
 
 const b64 = (o: object) => Buffer.from(JSON.stringify(o)).toString('base64url');
 const unsignedJwt = (claims: object) => `${b64({ alg: 'none', typ: 'JWT' })}.${b64(claims)}.`;
 
-async function access(c: { method?: string; body?: string; requester: string; purposes?: string[] }): Promise<Attempt> {
+async function access(c: Request): Promise<Attempt> {
+  const target = (c.home ?? ANNA_HOME).resource;
   const init: RequestInit = { method: c.method ?? 'GET', ...(c.body ? { body: c.body, headers: { 'content-type': 'text/turtle' } } : {}) };
-  const first = await fetch(RESOURCE, init);
+  const first = await fetch(target, init);
   const ticket = (first.headers.get('www-authenticate') ?? '').match(/ticket="([^"]+)"/)?.[1];
   const res: Attempt = { firstStatus: first.status, ticket };
   await first.text();
@@ -85,32 +97,33 @@ async function access(c: { method?: string; body?: string; requester: string; pu
   res.tokenStatus = token.status;
   res.tokenBody = await token.json().catch(() => ({}));
   if (token.status !== 200 || !res.tokenBody?.access_token) return res;
-  const second = await fetch(RESOURCE, { ...init, headers: { ...init.headers, authorization: `${res.tokenBody.token_type} ${res.tokenBody.access_token}` } });
+  const second = await fetch(target, { ...init, headers: { ...init.headers, authorization: `${res.tokenBody.token_type} ${res.tokenBody.access_token}` } });
   res.finalStatus = second.status;
   res.finalBody = await second.text();
   return res;
 }
 
-async function attempt(label: string, c: { method?: string; body?: string; requester: string; purposes?: string[] }): Promise<Attempt> {
+async function attempt(label: string, c: Request): Promise<Attempt> {
+  const h = c.home ?? ANNA_HOME;
   const r = await access(c);
   const action = ODRL + (c.method === 'PUT' ? 'write' : 'read');
-  const base = { correlation: r.ticket ?? 'no-ticket-' + crypto.randomUUID(), requester: c.requester, action };
+  const base = { owner: h.webid, resource: h.resource, correlation: r.ticket ?? 'no-ticket-' + crypto.randomUUID(), requester: c.requester, action };
   const purposes = c.purposes ?? [];
   await log({ ...base, type: 'AccessRequested', purposes, claimTypes: purposes.length ? ['webid', 'purpose'] : ['webid'], httpStatus: r.firstStatus, note: label });
   if (r.tokenStatus !== undefined) {
     const decision = r.tokenStatus === 200 ? 'granted' : r.tokenBody?.error === 'need_info' ? 'need_info' : 'denied';
     const umaSaid = `UMA answered ${r.tokenStatus}${r.tokenBody?.error ? ' ' + r.tokenBody.error : ''}.`;
-    if (c.requester === ANNA) {
-      await log({ ...base, type: 'DecisionMade', decision, httpStatus: r.tokenStatus, note: `${umaSaid} Owner access under P0.` });
+    if (c.requester === h.webid) {
+      await log({ ...base, type: 'DecisionMade', decision, httpStatus: r.tokenStatus, note: `${umaSaid} Owner access under ${h.ownerRule}.` });
     } else {
-      const policy = POLICIES.flatMap((f) => parseTurtle(read(f)));
-      r.replay = await replay(policy, { action, target: RESOURCE, requester: c.requester, purposes });
-      const file = POLICIES.find((f) => policyId(f) === r.replay?.active[0]?.policy);
+      const policy = h.policies.flatMap((f) => parseTurtle(read(f)));
+      r.replay = await replay(policy, { action, target: h.resource, requester: c.requester, purposes });
+      const file = h.policies.find((f) => policyId(f) === r.replay?.active[0]?.policy);
       const agree = (r.replay.decision === 'ALLOW') === (decision === 'granted');
       await log({
         ...base, type: 'DecisionMade', decision, httpStatus: r.tokenStatus, rules: r.replay.active.map((a) => a.rule),
         ...(file ? { policy: { id: policyId(file), hash: sha(read(file)) } } : {}),
-        note: `${umaSaid} Active rules from the run script's evaluator replay of Anna's policies, which says ${r.replay.decision}.`
+        note: `${umaSaid} Active rules from the run script's evaluator replay of ${h.name}'s policies, which says ${r.replay.decision}.`
           + (agree ? '' : ' MISMATCH: UMA and the replay disagree.'),
       });
       expect(`${label}: UMA and the replay agree`, agree);
@@ -128,19 +141,24 @@ const explain = (r: Attempt) => {
 };
 const rules = (r: Attempt) => r.replay?.active.map((a) => short(a.rule)).join(', ') || 'none';
 
-console.log('1. Anna sets up');
-for (const f of POLICIES) {
-  const status = await postPolicy(f);
-  console.log(`   posts ${f}: ${status}`);
-  // UMA keeps part of a deleted policy, so a policy can only be posted once per UMA start.
-  if (status === 409) { console.log('   UMA already holds this policy. Restart the stack for a clean run.'); process.exit(1); }
-  expect(`posting ${f} gives 201`, status === 201);
+async function setUp(step: number, h: Household) {
+  console.log(`${step}. ${h.name} sets up`);
+  for (const f of h.policies) {
+    const status = await postPolicy(f, h);
+    console.log(`   posts ${f}: ${status}`);
+    // UMA keeps part of a deleted policy, so a policy can only be posted once per UMA start.
+    if (status === 409) { console.log('   UMA already holds this policy. Restart the stack for a clean run.'); process.exit(1); }
+    expect(`posting ${f} gives 201`, status === 201);
+  }
+  const put = await attempt(`${h.name} stores ${h.possessive} meter readings`, { method: 'PUT', body: read(h.data), requester: h.webid, home: h });
+  console.log(`   stores ${h.data}: ${explain(put)}`);
+  expect(`${h.name} stores ${h.possessive} readings`, allowed(put));
 }
-const put = await attempt('Anna stores her meter readings', { method: 'PUT', body: read('demo/meter-readings.ttl'), requester: ANNA });
-console.log(`   stores demo/meter-readings.ttl: ${explain(put)}`);
-expect('Anna stores her readings', allowed(put));
 
-console.log('2. The City finds the data');
+await setUp(1, ANNA_HOME);
+await setUp(2, BOB_HOME);
+
+console.log('3. The City finds the data');
 const catalog = parseTurtle(await (await fetch(CATALOG)).text());
 // Only the offer on Anna's dataset: other listings have offers of their own.
 const offer = catalog.find((q) => q.subject.value === RESOURCE && q.predicate.value === ODRL + 'hasPolicy')?.object.value;
@@ -151,7 +169,7 @@ const offered = [...valueOf].filter(([c, v]) => v.startsWith(DPV) && permitted.h
 console.log(`   the offer accepts: ${offered.join(', ')}`);
 expect('the catalogue offers dpv:ImprovePublicServices', offered.includes('dpv:ImprovePublicServices'));
 
-console.log('3. The City asks');
+console.log('4. The City asks');
 const noPurpose = await attempt('City asks without a purpose', { requester: CITY });
 console.log(`   without a purpose: ${explain(noPurpose)}`);
 expect('City without a purpose is refused', !allowed(noPurpose));
@@ -159,7 +177,7 @@ const city = await attempt('City asks to improve public services', { requester: 
 console.log(`   with dpv:ImprovePublicServices: ${explain(city)}; rules: ${rules(city)}`);
 expect('City with dpv:ImprovePublicServices reads', allowed(city));
 
-console.log('4. EnerCo asks');
+console.log('5. EnerCo asks');
 const advice = await attempt('EnerCo asks to advise Anna', { requester: ENERCO, purposes: [DPV + 'OptimisationForConsumer'] });
 console.log(`   with dpv:OptimisationForConsumer: ${explain(advice)}; rules: ${rules(advice)}`);
 expect('EnerCo with dpv:OptimisationForConsumer reads', allowed(advice));
@@ -169,7 +187,7 @@ expect('EnerCo with dpv:PersonalisedAdvertising is refused', !allowed(ads));
 
 await pause(200);
 const chain = await (await fetch(`${LOG}/verify`)).json() as { ok: boolean; records?: number; brokenAt?: number };
-console.log(`5. The log: ${chain.records ?? '?'} records, chain ${chain.ok ? 'intact' : 'broken at ' + chain.brokenAt}. Anna's page: ${LOG}/`);
+console.log(`6. The log: ${chain.records ?? '?'} records, chain ${chain.ok ? 'intact' : 'broken at ' + chain.brokenAt}. Anna's page: ${LOG}/`);
 expect('the log chain verifies', chain.ok);
 
 console.log(failures.length ? `FAILED:\n - ${failures.join('\n - ')}` : 'All expected outcomes met.');
