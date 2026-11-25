@@ -36,14 +36,12 @@ const DCT = 'http://purl.org/dc/terms/';
 const PROV = 'http://www.w3.org/ns/prov#';
 const D23 = 'http://example.org/d23/';
 const odrl = (term: string) => namedNode(ODRL + term);
-const PREFIXES = {
-  dcat: DCAT, dct: DCT, odrl: ODRL, dpv: 'https://w3id.org/dpv#',
-  xsd: 'http://www.w3.org/2001/XMLSchema#', prov: PROV, d23: D23,
-};
 
-async function parseFile(path: string): Promise<Quad[]> {
+// The output uses the prefixes declared in the parsed files, plus prov: for the links the
+// server adds, so new vocabularies get short names without a change here.
+async function parseFile(path: string, prefixes: Record<string, string>): Promise<Quad[]> {
   try {
-    return new Parser().parse(await readFile(path, 'utf8'));
+    return new Parser().parse(await readFile(path, 'utf8'), null, (prefix, iri) => { prefixes[prefix] = iri.value; });
   } catch (err) {
     throw new Error(`${path}: ${(err as Error).message}`);
   }
@@ -96,9 +94,10 @@ function offerFor(asset: Quad_Subject, title: Term | undefined, rules: Store, ne
 }
 
 async function build(): Promise<string> {
-  const listing = await parseFile(file);
+  const prefixes: Record<string, string> = { prov: PROV };
+  const listing = await parseFile(file, prefixes);
   const rules = new Store();
-  for await (const name of glob('*.ttl', { cwd: policies })) rules.addQuads(await parseFile(join(policies, name)));
+  for await (const name of glob('*.ttl', { cwd: policies })) rules.addQuads(await parseFile(join(policies, name), prefixes));
 
   const catalog = new Store(listing);
   let n = 0;
@@ -112,8 +111,11 @@ async function build(): Promise<string> {
     const key = `${q.subject.termType}:${q.subject.value}`;
     groups.set(key, [...(groups.get(key) ?? []), q]);
   }
-  const writer = new Writer({ prefixes: PREFIXES });
-  writer.addQuads([...groups.values()].flat());
+  const quads = [...groups.values()].flat();
+  const terms = quads.flatMap((q) => [q.subject, q.predicate, q.object, ...(q.object.termType === 'Literal' ? [q.object.datatype] : [])]);
+  const used = Object.entries(prefixes).filter(([, iri]) => terms.some((t) => t.termType === 'NamedNode' && t.value.startsWith(iri)));
+  const writer = new Writer({ prefixes: Object.fromEntries(used) });
+  writer.addQuads(quads);
   return new Promise((resolve, reject) => writer.end((err, text: string) => (err ? reject(err) : resolve(text))));
 }
 

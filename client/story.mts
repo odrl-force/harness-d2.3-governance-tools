@@ -142,10 +142,12 @@ expect('Anna stores her readings', allowed(put));
 
 console.log('2. The City finds the data');
 const catalog = parseTurtle(await (await fetch(CATALOG)).text());
+// Only the offer on Anna's dataset: other listings have offers of their own.
+const offer = catalog.find((q) => q.subject.value === RESOURCE && q.predicate.value === ODRL + 'hasPolicy')?.object.value;
+const permitted = new Set(catalog.filter((q) => q.subject.value === offer && q.predicate.value === ODRL + 'permission').map((q) => q.object.value));
 const valueOf = new Map(catalog.filter((q) => q.predicate.value === ODRL + 'rightOperand').map((q) => [q.subject.value, q.object.value]));
 const ruleOf = new Map(catalog.filter((q) => q.predicate.value === ODRL + 'constraint').map((q) => [q.object.value, q.subject.value]));
-const banned = new Set(catalog.filter((q) => q.predicate.value === ODRL + 'prohibition').map((q) => q.object.value));
-const offered = [...valueOf].filter(([c, v]) => v.startsWith(DPV) && !banned.has(ruleOf.get(c) ?? '')).map(([, v]) => short(v));
+const offered = [...valueOf].filter(([c, v]) => v.startsWith(DPV) && permitted.has(ruleOf.get(c) ?? '')).map(([, v]) => short(v));
 console.log(`   the offer accepts: ${offered.join(', ')}`);
 expect('the catalogue offers dpv:ImprovePublicServices', offered.includes('dpv:ImprovePublicServices'));
 
