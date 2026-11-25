@@ -1,9 +1,9 @@
 @prefix dcat: <http://www.w3.org/ns/dcat#> .
 @prefix dct:  <http://purl.org/dc/terms/> .
 @prefix odrl: <http://www.w3.org/ns/odrl/2/> .
-@prefix dpv:  <https://w3id.org/dpv#> .
-@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
 @prefix d23:  <http://example.org/d23/> .
+
+# The server adds an ODRL offer to each dataset from the rules in policies/*.ttl.
 
 # Catalogue
 d23:catalog
@@ -13,136 +13,13 @@ d23:catalog
 
 # Dataset: the resource in Anna's pod
 <http://localhost:3000/anna/energy/meter-readings>
-    a                dcat:Dataset , odrl:Asset ;
-    dct:title        "Anna's monthly electricity readings"@en ;
-    dct:description  "Twelve monthly readings for Anna's household"@en ;
-    dct:publisher    <http://localhost:3000/anna/profile/card#me> ;
-    dcat:distribution d23:meter-readings-turtle ;
-    odrl:hasPolicy   d23:offer-meter-readings .
+    a                 dcat:Dataset , odrl:Asset ;
+    dct:title         "Anna's monthly electricity readings"@en ;
+    dct:description   "Twelve monthly readings for Anna's household"@en ;
+    dct:publisher     <http://localhost:3000/anna/profile/card#me> ;
+    dcat:distribution d23:meter-readings-turtle .
 
 d23:meter-readings-turtle
     a              dcat:Distribution ;
     dcat:accessURL <http://localhost:3000/anna/energy/meter-readings> ;
     dcat:mediaType <http://www.iana.org/assignments/media-types/text/turtle> .
-
-<http://localhost:3000/anna/profile/card#me>   a odrl:Party .
-<http://localhost:3000/ghent/profile/card#me>  a odrl:Party .
-<http://localhost:3000/enerco/profile/card#me> a odrl:Party .
-
-# Offer
-d23:offer-meter-readings
-    a                odrl:Offer ;
-    odrl:uid         d23:offer-meter-readings ;
-    dct:title        "Who may read Anna's meter readings, and for what"@en ;
-    odrl:permission  d23:offer-city , d23:offer-enerco ;
-    odrl:prohibition d23:offer-no-marketing , d23:offer-no-advertising ,
-                     d23:offer-no-personalised-advertising ,
-                     d23:offer-no-targeted-advertising , d23:offer-no-direct-marketing .
-
-# Permission: DAO to improve public services till 2028
-d23:offer-city
-    a               odrl:Permission ;
-    odrl:action     odrl:read ;
-    odrl:target     <http://localhost:3000/anna/energy/meter-readings> ;
-    odrl:assigner   <http://localhost:3000/anna/profile/card#me> ;
-    odrl:assignee   <http://localhost:3000/ghent/profile/card#me> ;
-    odrl:constraint d23:offer-c-public-services , d23:offer-c-until-2028 .
-
-d23:offer-c-public-services
-    a                 odrl:Constraint ;
-    odrl:leftOperand  odrl:purpose ;
-    odrl:operator     odrl:eq ;
-    odrl:rightOperand dpv:ImprovePublicServices .
-
-d23:offer-c-until-2028
-    a                 odrl:Constraint ;
-    odrl:leftOperand  odrl:dateTime ;
-    odrl:operator     odrl:lt ;
-    odrl:rightOperand "2028-01-01T00:00:00Z"^^xsd:dateTime .
-
-# Permission: EnerCo advise Anna on her consumption till July 2027
-d23:offer-enerco
-    a               odrl:Permission ;
-    odrl:action     odrl:read ;
-    odrl:target     <http://localhost:3000/anna/energy/meter-readings> ;
-    odrl:assigner   <http://localhost:3000/anna/profile/card#me> ;
-    odrl:assignee   <http://localhost:3000/enerco/profile/card#me> ;
-    odrl:constraint d23:offer-c-advice , d23:offer-c-until-2027-07 .
-
-d23:offer-c-advice
-    a                 odrl:Constraint ;
-    odrl:leftOperand  odrl:purpose ;
-    odrl:operator     odrl:eq ;
-    odrl:rightOperand dpv:OptimisationForConsumer .
-
-d23:offer-c-until-2027-07
-    a                 odrl:Constraint ;
-    odrl:leftOperand  odrl:dateTime ;
-    odrl:operator     odrl:lt ;
-    odrl:rightOperand "2027-07-01T00:00:00Z"^^xsd:dateTime .
-
-# Prohibitions: nobody may read them for these prohibited uses.
-d23:offer-no-marketing
-    a               odrl:Prohibition ;
-    odrl:action     odrl:read ;
-    odrl:target     <http://localhost:3000/anna/energy/meter-readings> ;
-    odrl:assigner   <http://localhost:3000/anna/profile/card#me> ;
-    odrl:constraint d23:offer-c-marketing .
-
-d23:offer-c-marketing
-    a                 odrl:Constraint ;
-    odrl:leftOperand  odrl:purpose ;
-    odrl:operator     odrl:eq ;
-    odrl:rightOperand dpv:Marketing .
-
-d23:offer-no-advertising
-    a               odrl:Prohibition ;
-    odrl:action     odrl:read ;
-    odrl:target     <http://localhost:3000/anna/energy/meter-readings> ;
-    odrl:assigner   <http://localhost:3000/anna/profile/card#me> ;
-    odrl:constraint d23:offer-c-advertising .
-
-d23:offer-c-advertising
-    a                 odrl:Constraint ;
-    odrl:leftOperand  odrl:purpose ;
-    odrl:operator     odrl:eq ;
-    odrl:rightOperand dpv:Advertising .
-
-d23:offer-no-personalised-advertising
-    a               odrl:Prohibition ;
-    odrl:action     odrl:read ;
-    odrl:target     <http://localhost:3000/anna/energy/meter-readings> ;
-    odrl:assigner   <http://localhost:3000/anna/profile/card#me> ;
-    odrl:constraint d23:offer-c-personalised-advertising .
-
-d23:offer-c-personalised-advertising
-    a                 odrl:Constraint ;
-    odrl:leftOperand  odrl:purpose ;
-    odrl:operator     odrl:eq ;
-    odrl:rightOperand dpv:PersonalisedAdvertising .
-
-d23:offer-no-targeted-advertising
-    a               odrl:Prohibition ;
-    odrl:action     odrl:read ;
-    odrl:target     <http://localhost:3000/anna/energy/meter-readings> ;
-    odrl:assigner   <http://localhost:3000/anna/profile/card#me> ;
-    odrl:constraint d23:offer-c-targeted-advertising .
-
-d23:offer-c-targeted-advertising
-    a                 odrl:Constraint ;
-    odrl:leftOperand  odrl:purpose ;
-    odrl:operator     odrl:eq ;
-    odrl:rightOperand dpv:TargetedAdvertising .
-
-d23:offer-no-direct-marketing
-    a               odrl:Prohibition ;
-    odrl:action     odrl:read ;
-    odrl:target     <http://localhost:3000/anna/energy/meter-readings> ;
-    odrl:assigner   <http://localhost:3000/anna/profile/card#me> ;
-    odrl:constraint d23:offer-c-direct-marketing .
-
-d23:offer-c-direct-marketing
-    a                 odrl:Constraint ;
-    odrl:leftOperand  odrl:purpose ;
-    odrl:operator     odrl:eq ;
-    odrl:rightOperand dpv:DirectMarketing .
