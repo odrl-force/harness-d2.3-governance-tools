@@ -116,7 +116,8 @@ async function load() {
   }
   const html = [...groups.entries()].reverse().map(([id, list]) => {
     const first = list[0];
-    const mine = id === 'setup' || first.requester === OWNER;
+    // Adding or removing a rule is always the owner's own action.
+    const mine = id === 'setup' || first.requester === OWNER || first.type === 'PolicyCreated' || first.type === 'PolicyRemoved';
     const title = `${mine ? 'Your actions' : esc(nameOf(first.requester ?? ''))}, ${day(first.recordedAt ?? first.time)}`;
     return `<section class="attempt"><h2>${title}</h2><ol>${list.map((e) => `<li>${sentence(e)} <span class="small">${clock(e.recordedAt ?? e.time)}</span>${claimed(e)}</li>`).join('')}</ol>`
       + `<p class="small">Recorded by ${esc(first.source)}${first.note && id !== 'setup' ? ': ' + esc(first.note) : ''}</p></section>`;

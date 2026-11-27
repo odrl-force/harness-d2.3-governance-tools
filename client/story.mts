@@ -83,6 +83,19 @@ async function postPolicy(file: string, h: Household): Promise<number> {
   return r.status;
 }
 
+// Removing a policy is how an owner withdraws what it granted. The replay stops using it as well.
+async function removePolicy(file: string, h: Household, note: string): Promise<number> {
+  const id = policyId(file);
+  const r = await fetch(`${UMA}/policies/${encodeURIComponent(id)}`, {
+    method: 'DELETE', headers: { authorization: `WebID ${encodeURIComponent(h.webid)}` },
+  });
+  if (r.ok) {
+    h.policies = h.policies.filter((f) => f !== file);
+    await log({ type: 'PolicyRemoved', owner: h.webid, resource: h.resource, correlation: 'withdrawal-' + crypto.randomUUID(), policy: { id, hash: sha(read(file)) }, note });
+  }
+  return r.status;
+}
+
 const b64 = (o: object) => Buffer.from(JSON.stringify(o)).toString('base64url');
 const unsignedJwt = (claims: object) => `${b64({ alg: 'none', typ: 'JWT' })}.${b64(claims)}.`;
 
@@ -258,9 +271,18 @@ const studyBob = await attempt('Research study asks Bob for scientific research'
 console.log(`   Bob, with ${research}: ${explain(studyBob)}; rules: ${rules(studyBob)}`);
 expect('the study reads Bob\'s readings', allowed(studyBob));
 
+// #43: P1 is Anna's consent to the City (data altruism, GDPR Art. 7(3)). Withdrawing it removes the policy.
+console.log('8. Anna withdraws her consent to the City');
+const removed = await removePolicy('policies/p1-altruism-city.ttl', ANNA_HOME, 'Anna withdraws her consent to the City (P1)');
+console.log(`   removes policies/p1-altruism-city.ttl: ${removed}`);
+expect('removing P1 succeeds', removed >= 200 && removed < 300);
+const cityAgain = await attempt('City asks again after Anna withdrew her consent', { requester: CITY, purposes: [DPV + 'ImprovePublicServices'] });
+console.log(`   the City, with dpv:ImprovePublicServices: ${explain(cityAgain)}; rules: ${rules(cityAgain)}`);
+expect('the City is refused after the withdrawal', !allowed(cityAgain));
+
 await pause(200);
 const chain = await (await fetch(`${LOG}/verify`)).json() as { ok: boolean; records?: number; brokenAt?: number };
-console.log(`8. The log: ${chain.records ?? '?'} records, chain ${chain.ok ? 'intact' : 'broken at ' + chain.brokenAt}. Anna's page: ${LOG}/`);
+console.log(`9. The log: ${chain.records ?? '?'} records, chain ${chain.ok ? 'intact' : 'broken at ' + chain.brokenAt}. Anna's page: ${LOG}/`);
 expect('the log chain verifies', chain.ok);
 
 console.log(failures.length ? `FAILED:\n - ${failures.join('\n - ')}` : 'All expected outcomes met.');

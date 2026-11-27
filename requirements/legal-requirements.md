@@ -81,7 +81,7 @@ BE: on D2, under 'What must be documented', should be:
 |------------------------------|----------------------|--------------------------------------------------------------|--------------------------------------------------------|
 | G1 (Lawful basis)            | Unsure               | Legal basis constraint                                       | To test                                                |
 | G2 (Purpose)                 | Yes                  | `dpv:Purpose` constraint                                     | Multiple purposes currently pass (see D2)              |
-| G3 (Consent)                 | No                   | None. Consent is represented by the owner's policy           | Consent state and withdrawal not supported             |
+| G3 (Consent)                 | Partly               | Withdrawal removes the owner's policy (story step 8)         | Tokens issued before withdrawal last up to 30 minutes  |
 | G4 (Time limits)             | Yes                  | `odrl:dateTime` constraint                                   | None known                                             |
 | G5 (Information provision)   | TBD                  | TBD                                                          | TBD                                                    |
 | G7 (By design)               | Yes                  | Default-deny decision strategy                               | None known                                             |
